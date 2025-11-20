@@ -14,8 +14,19 @@ const total = computed(() =>
 </script>
 
 <template>
+  <div id="app">
+    <header class ="app-header">
+      <h1>Budget Planner</h1>
+      <nav class="menu">
+        <a href="#">TBD </a>
+        <a href="#">TBD </a>
+        <a href="#">TBD </a>
+        <a href="#">TBD </a>
+      </nav>
+      <div class="header-logo">Logo</div>
+    </header>
+  </div>
   <main>
-    <h1>Mein Budget Planer</h1>
 
     <BudgetList :entries="entries" />
 
@@ -27,6 +38,17 @@ const total = computed(() =>
 </template>
 
 <style scoped>
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  background-color: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+
 .warning {
   color: red;
   font-weight: bold;
