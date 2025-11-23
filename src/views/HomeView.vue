@@ -2,6 +2,11 @@
 import { ref, computed, onMounted } from 'vue'
 import BudgetList from '../components/BudgetList.vue'
 
+interface Budget {
+  month: string
+  limit: number
+}
+
 interface Entry {
   id: number
   title: string
@@ -16,7 +21,7 @@ onMounted(async () => {
     const response = await fetch('http://localhost:8080/budgets')
     const data = await response.json()
     // Backend liefert Budget-Objekte, wir mappen sie auf Entry
-    entries.value = data.map((budget: any, index: number) => ({
+    entries.value = data.map((budget: Budget, index: number) => ({
       id: index,
       title: budget.month,
       amount: budget.limit
@@ -63,7 +68,6 @@ const total = computed(() =>
   background-color: white;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
-
 
 .warning {
   color: red;
