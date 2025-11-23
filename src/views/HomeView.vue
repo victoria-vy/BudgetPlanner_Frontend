@@ -1,13 +1,29 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import BudgetList from '../components/BudgetList.vue'
 
-const entries = ref([
-  { id: 1, title: 'Gehalt', amount: 2500 },
-  { id: 2, title: 'Miete', amount: -1200 },
-  { id: 3, title: 'Einkauf', amount: -300 }
-])
+interface Entry {
+  id: number
+  title: string
+  amount: number
+}
 
+const entries = ref<Entry[]>([])
+
+// Daten vom Backend laden
+onMounted(async () => {
+  try {
+    const response = await fetch('http://localhost:8080/budgets')
+    const data = await response.json()
+    // Backend liefert Budget-Objekte, wir mappen sie auf Entry
+    entries.value = data.map((budget: any, index: number) => ({
+      id: index,
+      title: budget.month,
+      amount: budget.limit
+    }))
+  } catch (error) {
+      console.error('Fehler beim Laden der Budgets:', error)
+  }})
 const total = computed(() =>
   entries.value.reduce((sum, e) => sum + e.amount, 0)
 )
