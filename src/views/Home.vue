@@ -5,6 +5,7 @@ import BudgetList from '../components/BudgetList.vue'
 interface Budget {
   month: string
   limit: number
+  //TODO alle Variablen übergeben lassen
 }
 
 interface Entry {
@@ -15,12 +16,12 @@ interface Entry {
 
 const entries = ref<Entry[]>([])
 
-// Daten vom Backend laden
+// TODO aufräumen
 onMounted(async () => {
   try {
     const response = await fetch('http://localhost:8080/budgets')
     const data = await response.json()
-    // Backend liefert Budget-Objekte, wir mappen sie auf Entry
+    // TODO aufräumen
     entries.value = data.map((budget: Budget, index: number) => ({
       id: index,
       title: budget.month,
@@ -39,10 +40,11 @@ const total = computed(() =>
     <header class ="app-header">
       <h1>Budget Planner</h1>
       <nav class="menu">
-        <a href="#">TBD </a>
-        <a href="#">TBD </a>
-        <a href="#">TBD </a>
-        <a href="#">TBD </a>
+        <a href="#">Home</a> &nbsp;
+        <a href="#">Expenses</a> &nbsp;
+        <a href="#">Income</a> &nbsp;
+        <a href="#">Report</a> &nbsp;
+        <a href="#">Account</a> &nbsp;
       </nav>
       <div class="header-logo">Logo</div>
     </header>
@@ -56,6 +58,9 @@ const total = computed(() =>
       <p v-if="total < 0" class="warning">Du bist im Minus!</p>
     </div>
   </main>
+  <footer>
+    //TODO hier steht ein footer
+  </footer>
 </template>
 
 <style scoped>
@@ -64,8 +69,8 @@ const total = computed(() =>
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 40px;
-  background-color: white;
+  padding: 0px 0px;
+  background-color: whitesmoke;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
