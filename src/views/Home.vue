@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import BudgetList from '../components/BudgetList.vue'
 
+
 interface Budget {
   month: string
   limit: number
@@ -19,7 +20,8 @@ const entries = ref<Entry[]>([])
 // TODO aufräumen
 onMounted(async () => {
   try {
-    const response = await fetch('http://localhost:8080/budgets')
+    const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+    const response = await fetch(baseUrl + "/budgets");
     const data = await response.json()
     // TODO aufräumen
     entries.value = data.map((budget: Budget, index: number) => ({
