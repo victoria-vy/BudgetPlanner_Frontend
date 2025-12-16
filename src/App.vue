@@ -1,9 +1,17 @@
-<template>
-  <RouterView />
-</template>
-
 <script setup lang="ts">
+import AppMenu from '@/components/AppMenu.vue'
 </script>
+
+<template>
+  <header class = "app-header">
+    <h1>Budget Planner</h1>
+    <AppMenu/>
+  </header>
+
+  <main>
+    <RouterView/>
+  </main>
+</template>
 
 <style>
 body {

@@ -3,8 +3,11 @@ import { ref, computed, onMounted } from 'vue'
 import BudgetList from '../components/BudgetList.vue'
 import type {Entry} from '@/models/Entry.ts'
 import {getBudgets} from '@/service/budgetService.ts'
+import {createBudget} from '@/service/budgetService.ts'
 
 const entries = ref<Entry[]>([])
+const month = ref('')
+const limit = ref(0)
 
 onMounted(async () => {
   try {
@@ -18,6 +21,23 @@ onMounted(async () => {
       console.error(error)
   }})
 
+async function submit(){
+  await createBudget({
+    month: month.value,
+    limit: limit.value
+  })
+
+  const budget = await getBudgets()
+  entries.value = budget.map((b, index) => ({
+    id: index,
+    title:b.month,
+    amount:b.limit
+  }))
+
+  month.value =''
+  limit.value = 0
+}
+
 const total = computed(() =>
   entries.value.reduce((sum, e) => sum + e.amount, 0)
 )
@@ -30,6 +50,20 @@ const total = computed(() =>
     <div class="summary">
       <p>Gesamt: {{ total }} €</p>
       <p v-if="total < 0" class="warning">Du bist im Minus!</p>
+
+      <form @submit.prevent="submit">
+        <input
+        v-model = "month"
+        placeholder = "Monat"
+        required/>
+        <input
+          v-model.number = "limit"
+          type = "number"
+          placeholder = "Budget"
+          required/>
+        <button type = "submit">Speichern</button>
+      </form>
+
     </div>
   </main>
 </template>
