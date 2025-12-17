@@ -1,13 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
 import Account from '@/views/Account.vue'
 import Expenses from '@/views/Expenses.vue'
 import Income from '@/views/Income.vue'
 import Report from '@/views/Report.vue'
+import Home from '@/views/Home.vue'
+import Impressum from '@/views/Impressum.vue'
+import Datenschutzerklärung from '@/views/Datenschutzerklärung.vue'
+import AGB from '@/views/AGB.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [{
+  routes: [/*{
+    path: '/',
+    name: 'home',
+    component: HomeAlt
+  },*/
+  {
     path: '/',
     name: 'home',
     component: Home
@@ -31,6 +39,21 @@ const router = createRouter({
     path: '/Report',
     name: 'Report',
     component: Report
+  },
+  {
+   path: '/AGB',
+   name: 'AGB',
+   component: AGB
+  },
+  {
+   path: '/Impressum',
+   name: 'Impressum',
+   component: Impressum
+  },
+  {
+    path: '/Datenschutzerklärung',
+    name: 'Datenschutzerklärung',
+    component: Datenschutzerklärung
   }],
 })
 

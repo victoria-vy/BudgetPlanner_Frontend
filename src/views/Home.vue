@@ -1,87 +1,110 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import BudgetList from '../components/BudgetList.vue'
-import type {Entry} from '@/models/Entry.ts'
-import {getBudgets} from '@/service/budgetService.ts'
-import {createBudget} from '@/service/budgetService.ts'
-
-const entries = ref<Entry[]>([])
-const month = ref('')
-const limit = ref(0)
-
-onMounted(async () => {
-  try {
-    const budget = await getBudgets()
-    entries.value = budget.map((b, index) => ({
-      id: index,
-      title: b.month,
-      amount: b.limit
-    }))
-  } catch (error) {
-      console.error(error)
-  }})
-
-async function submit(){
-  await createBudget({
-    month: month.value,
-    limit: limit.value
-  })
-
-  const budget = await getBudgets()
-  entries.value = budget.map((b, index) => ({
-    id: index,
-    title:b.month,
-    amount:b.limit
-  }))
-
-  month.value =''
-  limit.value = 0
+import {useRouter} from 'vue-router'
+const router = useRouter()
+function goTo (route: string){
+  router.push(route)
 }
-
-const total = computed(() =>
-  entries.value.reduce((sum, e) => sum + e.amount, 0)
-)
 </script>
 
 <template>
-  <main>
-    <BudgetList :entries="entries" />
+  <main class="home">
 
-    <div class="summary">
-      <p>Gesamt: {{ total }} €</p>
-      <p v-if="total < 0" class="warning">Du bist im Minus!</p>
+    <section class="feature-grid">
 
-      <form @submit.prevent="submit">
-        <input
-        v-model = "month"
-        placeholder = "Monat"
-        required/>
-        <input
-          v-model.number = "limit"
-          type = "number"
-          placeholder = "Budget"
-          required/>
-        <button type = "submit">Speichern</button>
-      </form>
+      <!-- Kachel 1 -->
+      <div class="feature-card">
+        <h2>Platzhalter</h2>
+        <p>Platzhalter</p>
+        <button @click="goTo('/budgets')">
+          Öffnen
+        </button>
+      </div>
 
-    </div>
+      <!-- Kachel 2 -->
+      <div class="feature-card">
+        <h2>Platzhalter</h2>
+        <p>Platzhalter</p>
+        <button @click="goTo('/expenses')">
+          Öffnen
+        </button>
+      </div>
+
+      <!-- Kachel 3 -->
+      <div class="feature-card">
+        <h2>Platzhalter</h2>
+        <p>Platzhalter</p>
+        <button @click="goTo('/stats')">
+          Öffnen
+        </button>
+      </div>
+
+      <!-- Kachel 4 -->
+      <div class="feature-card">
+        <h2>Platzhalter</h2>
+        <p>Platzhalter</p>
+        <button @click="goTo('/settings')">
+          Öffnen
+        </button>
+      </div>
+
+    </section>
+
   </main>
 </template>
 
 <style scoped>
-
-.app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0px 0px;
-  background-color: whitesmoke;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+.home {
+  padding: 3rem 4rem;
 }
 
-.warning {
-  color: red;
-  font-weight: bold;
+/* Grid wie im Mockup */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3rem;
+
+  max-width: 900px;   /* ⭐ wichtig */
+  margin: 0 auto;     /* zentrieren */
+}
+
+
+/* Einzelne Kachel */
+.feature-card {
+  background-color: #ffffff;
+  border: 2px solid #000;
+  padding: 2rem;
+  min-height: 200px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Titel */
+.feature-card h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+/* Beschreibung */
+.feature-card p {
+  margin: 1rem 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Button */
+.feature-card button {
+  align-self: flex-start;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  background-color: #000;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.feature-card button:hover {
+  opacity: 0.85;
 }
 </style>
-
