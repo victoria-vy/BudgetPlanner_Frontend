@@ -46,7 +46,12 @@ function goTo (route: string){
           Öffnen
         </button>
       </div>
+    </section>
 
+    <!-- Inhaltsübersicht -->
+    <section class="overview-box">
+      <h2>Platzhalter</h2>
+      <p>Kurze Inhaltsübersicht</p>
     </section>
 
   </main>
@@ -54,57 +59,67 @@ function goTo (route: string){
 
 <style scoped>
 .home {
-  padding: 3rem 4rem;
+padding: 3rem 4rem;
 }
 
-/* Grid wie im Mockup */
+/* Grid */
 .feature-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 3rem;
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 2.5rem;
 
-  max-width: 900px;   /* ⭐ wichtig */
-  margin: 0 auto;     /* zentrieren */
+width: auto;
+margin: 0 auto 3rem;
 }
-
 
 /* Einzelne Kachel */
 .feature-card {
-  background-color: #ffffff;
-  border: 2px solid #000;
-  padding: 2rem;
-  min-height: 200px;
+background-color: #d9d9d9;
+border: 2px solid #000;
+padding: 1.5rem;
+height: 100px;
 
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+display: flex;
+flex-direction: column;
+justify-content: space-between;
 }
 
 /* Titel */
 .feature-card h2 {
-  margin: 0;
-  font-size: 1.5rem;
+margin: 0;
+font-size: 1.4rem;
 }
 
 /* Beschreibung */
 .feature-card p {
-  margin: 1rem 0;
-  font-size: 1rem;
-  color: #333;
+margin: 0.5rem 0;
+font-size: 1rem;
+color: #333;
 }
 
-/* Button */
+/* Button mittig */
 .feature-card button {
-  align-self: flex-start;
-  padding: 0.6rem 1.2rem;
-  border: none;
-  background-color: #000;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1rem;
+align-self: center;   /* ⭐ mittig */
+padding: 0.5rem 1.8rem;
+border: none;
+background-color: #000;
+color: #fff;
+cursor: pointer;
+font-size: 1rem;
 }
 
 .feature-card button:hover {
-  opacity: 0.85;
+opacity: 0.85;
+}
+
+/* 🔽 Platzhalter-Kasten unten */
+.overview-box {
+max-width: 1100px;   /* exakt wie Grid */
+margin: 0 auto;
+padding: 2rem;
+
+background-color: #d9d9d9;
+border: 2px solid #000;
+height: 220px;
 }
 </style>

@@ -12,10 +12,11 @@ import logo from '@/assets/Logo_mitSchrift.png'
 
     <!-- Mitte -->
     <nav class="header-menu">
-      <RouterLink to="/">Home</RouterLink>
+      <RouterLink to="/home">Home</RouterLink>
       <RouterLink to="/expenses">Expenses</RouterLink>
       <RouterLink to="/income">Income</RouterLink>
       <RouterLink to="/report">Report</RouterLink>
+      <RouterLink to="/stocks">Stocks</RouterLink>
       <RouterLink to="/account">Account</RouterLink>
     </nav>
   </header>

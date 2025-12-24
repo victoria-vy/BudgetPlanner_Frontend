@@ -7,6 +7,7 @@ import Home from '@/views/Home.vue'
 import Impressum from '@/views/Impressum.vue'
 import Datenschutzerklärung from '@/views/Datenschutzerklärung.vue'
 import AGB from '@/views/AGB.vue'
+import Stocks from '@/views/Stocks.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -54,6 +55,11 @@ const router = createRouter({
     path: '/Datenschutzerklärung',
     name: 'Datenschutzerklärung',
     component: Datenschutzerklärung
+  },
+  {
+    path: '/Stocks',
+    name: 'Stocks',
+    component: Stocks
   }],
 })
 
