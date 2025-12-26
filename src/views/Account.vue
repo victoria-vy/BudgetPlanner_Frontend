@@ -90,7 +90,7 @@
 
 .feature-card {
   background-color: #ffffff;
-  border: 2px solid #000;
+  border: 2px solid #dadada;
   padding: 2.5rem;
   min-height: 450px;
 
@@ -108,7 +108,7 @@
 /* Input-Felder */
 .input-field {
   background-color: #e4e4e4;
-  color: #000000;
+  color: #dadada;
   border: none;
   border-radius: 12px;
   padding: 1rem;

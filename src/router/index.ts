@@ -17,7 +17,7 @@ const router = createRouter({
     component: HomeAlt
   },*/
   {
-    path: '/',
+    path: '/home',
     name: 'home',
     component: Home
   },
