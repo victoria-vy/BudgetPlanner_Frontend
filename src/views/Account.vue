@@ -20,6 +20,7 @@
 </script>
 
 <template>
+  <!-- TODO: Backend einbinden, damit User gespeichert wird -->
   <main>
     <section class="feature-grid">
       <!-- Log In -->

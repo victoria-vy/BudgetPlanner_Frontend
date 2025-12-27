@@ -7,6 +7,7 @@ function goTo (route: string){
 </script>
 
 <template>
+  <!-- TODO: Aussehen implementieren -->
   <main class="home">
 
     <section class="feature-grid">
