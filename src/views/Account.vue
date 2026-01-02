@@ -10,12 +10,48 @@
   const signupEmail = ref("");
   const signupPassword = ref("");
 
-  const handleLogin = () => {
-    console.log("Login:", loginEmail.value, loginPassword.value);
+  const handleLogin = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/auth/login",{
+      method: "POST",
+        headers: {
+        "Content-Type:":"application/json",
+      },
+      body: JSON.stringify({
+        email: loginEmail.value,
+        password: loginPassword.value,
+      }),
+      });
+
+      const result = await response.text();
+      alert(result);
+
+    } catch(error){
+      console.error("Login error:", error);
+      alert("Anmeldung fehlgeschlagen");
+    }
   };
 
-  const handleSignup = () => {
-    console.log("Signup:", signupName.value, signupEmail.value, signupPassword.value);
+  const handleSignup = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: signupName.value,
+          email: signupEmail.value,
+          password: signupPassword.value,
+        }),
+      });
+
+      const result = await response.text();
+      alert(result);
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("Registrierung fehlgeschlagen");
+    }
   };
 </script>
 
