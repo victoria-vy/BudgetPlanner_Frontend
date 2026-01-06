@@ -15,7 +15,7 @@
       const response = await fetch("http://localhost:8080/api/auth/login",{
       method: "POST",
         headers: {
-        "Content-Type:":"application/json",
+        "Content-Type":"application/json",
       },
       body: JSON.stringify({
         email: loginEmail.value,
@@ -68,6 +68,7 @@
           placeholder="E-Mail"
           v-model="loginEmail"
           class="input-field"
+          data-testid="login-email"
         />
 
         <input
@@ -75,9 +76,10 @@
           placeholder="Passwort"
           v-model="loginPassword"
           class="input-field"
+          data-testid="login-password"
         />
 
-        <button class="primary-button" @click="handleLogin">
+        <button class="primary-button" data-testid="login-button"@click="handleLogin">
           Log In
         </button>
       </div>
@@ -91,6 +93,7 @@
           placeholder="Vorname, Nachname"
           v-model="signupName"
           class="input-field"
+          data-testid="signup-name"
         />
 
         <input
@@ -98,6 +101,7 @@
           placeholder="E-Mail"
           v-model="signupEmail"
           class="input-field"
+          data-testid="signup-email"
         />
 
         <input
@@ -105,9 +109,10 @@
           placeholder="Passwort"
           v-model="signupPassword"
           class="input-field"
+          data-testid="signup-password"
         />
 
-        <button class="primary-button" @click="handleSignup">
+        <button class="primary-button" data-testid="signup-button"@click="handleSignup">
           Sign Up
         </button>
       </div>
