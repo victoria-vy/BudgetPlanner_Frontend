@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { setBasicAuth, clearBasicAuth, isLoggedIn } from "@/service/authService.ts";
+import { setToken, clearToken, isLoggedIn } from "@/service/authService.ts";
 
 const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
-// Log In
 const loginEmail = ref("");
 const loginPassword = ref("");
 
-// Sign Up
 const signupName = ref("");
 const signupEmail = ref("");
 const signupPassword = ref("");
@@ -17,25 +15,26 @@ const loggedIn = computed(() => isLoggedIn());
 
 async function handleLogin() {
   try {
-    // 1) Credentials speichern (Basic Auth)
-    setBasicAuth(loginEmail.value, loginPassword.value);
-
-    // 2) Test-Call auf protected endpoint, um zu prüfen ob creds stimmen
-    const auth = localStorage.getItem("budgetplanner_basic_auth");
-    const res = await fetch(`${baseUrl}/api/stocks`, {
-      headers: { Authorization: `Basic ${auth}` },
+    const res = await fetch(`${baseUrl}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: loginEmail.value,
+        password: loginPassword.value,
+      }),
     });
 
     if (!res.ok) {
-      // creds falsch -> wieder löschen
-      clearBasicAuth();
-      alert("Login fehlgeschlagen (E-Mail/Passwort falsch?)");
+      const txt = await res.text();
+      alert(`Login fehlgeschlagen: ${txt}`);
       return;
     }
 
+    const data = await res.json(); // { token, name, email }
+    setToken(data.token);
     alert("Login erfolgreich");
+
   } catch (e) {
-    clearBasicAuth();
     console.error(e);
     alert("Login fehlgeschlagen");
   }
@@ -43,7 +42,7 @@ async function handleLogin() {
 
 async function handleSignup() {
   try {
-    const response = await fetch(`${baseUrl}/api/auth/register`, {
+    const res = await fetch(`${baseUrl}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -53,21 +52,21 @@ async function handleSignup() {
       }),
     });
 
-    if (!response.ok) {
-      const msg = await response.text();
-      alert(`Registrierung fehlgeschlagen: ${msg}`);
+    if (!res.ok) {
+      const txt = await res.text();
+      alert(`Registrierung fehlgeschlagen: ${txt}`);
       return;
     }
 
     alert("Registrierung erfolgreich");
-  } catch (error) {
-    console.error("Signup error:", error);
+  } catch (e) {
+    console.error(e);
     alert("Registrierung fehlgeschlagen");
   }
 }
 
 function handleLogout() {
-  clearBasicAuth();
+  clearToken();
   alert("Logout erfolgreich");
 }
 </script>
@@ -81,9 +80,7 @@ function handleLogout() {
         <input type="email" placeholder="E-Mail" v-model="loginEmail" class="input-field" />
         <input type="password" placeholder="Passwort" v-model="loginPassword" class="input-field" />
 
-        <button class="primary-button" @click="handleLogin">
-          Log In
-        </button>
+        <button class="primary-button" @click="handleLogin">Log In</button>
 
         <button v-if="loggedIn" class="secondary-button" @click="handleLogout">
           Logout
@@ -97,9 +94,7 @@ function handleLogout() {
         <input type="email" placeholder="E-Mail" v-model="signupEmail" class="input-field" />
         <input type="password" placeholder="Passwort" v-model="signupPassword" class="input-field" />
 
-        <button class="primary-button" @click="handleSignup">
-          Sign Up
-        </button>
+        <button class="primary-button" @click="handleSignup">Sign Up</button>
       </div>
     </section>
   </main>
@@ -114,44 +109,26 @@ function handleLogout() {
   margin: 0 auto;
   font-family: "Apple Braille";
 }
-
 .feature-card {
   background-color: #ffffff;
   border: 2px solid #dadada;
   padding: 2.5rem;
   min-height: 450px;
-
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
-
-.feature-card h2 {
-  text-align: center;
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-}
-
-/* Input-Felder */
 .input-field {
   background-color: #e4e4e4;
-  color: #dadada;
   border: none;
   border-radius: 12px;
   padding: 1rem;
   font-size: 1.1rem;
   font-family: "Apple Braille";
 }
-
-.input-field::placeholder {
-  color: #000000;
-}
-
-/* Button */
 .primary-button {
   margin-top: auto;
   background-color: #b4dda5;
-  color: #000000;
   border: none;
   border-radius: 12px;
   padding: 1rem;
@@ -159,19 +136,13 @@ function handleLogout() {
   cursor: pointer;
   font-family: "Apple Braille";
 }
-
 .secondary-button {
   background: #ddd;
-  color: #000;
   border: none;
   border-radius: 12px;
   padding: 1rem;
   font-size: 1.1rem;
   cursor: pointer;
   font-family: "Apple Braille";
-}
-
-.primary-button:hover {
-  background-color: #5c9644;
 }
 </style>
