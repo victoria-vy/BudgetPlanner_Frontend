@@ -1,118 +1,103 @@
 <script setup lang="ts">
-  import { ref } from "vue";
+import { ref, computed } from "vue";
+import { setBasicAuth, clearBasicAuth, isLoggedIn } from "@/service/authService.ts";
 
-  /* Log In */
-  const loginEmail = ref("");
-  const loginPassword = ref("");
+const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
-  /* Sign Up */
-  const signupName = ref("");
-  const signupEmail = ref("");
-  const signupPassword = ref("");
+// Log In
+const loginEmail = ref("");
+const loginPassword = ref("");
 
-  const handleLogin = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/auth/login",{
+// Sign Up
+const signupName = ref("");
+const signupEmail = ref("");
+const signupPassword = ref("");
+
+const loggedIn = computed(() => isLoggedIn());
+
+async function handleLogin() {
+  try {
+    // 1) Credentials speichern (Basic Auth)
+    setBasicAuth(loginEmail.value, loginPassword.value);
+
+    // 2) Test-Call auf protected endpoint, um zu prüfen ob creds stimmen
+    const auth = localStorage.getItem("budgetplanner_basic_auth");
+    const res = await fetch(`${baseUrl}/api/stocks`, {
+      headers: { Authorization: `Basic ${auth}` },
+    });
+
+    if (!res.ok) {
+      // creds falsch -> wieder löschen
+      clearBasicAuth();
+      alert("Login fehlgeschlagen (E-Mail/Passwort falsch?)");
+      return;
+    }
+
+    alert("Login erfolgreich");
+  } catch (e) {
+    clearBasicAuth();
+    console.error(e);
+    alert("Login fehlgeschlagen");
+  }
+}
+
+async function handleSignup() {
+  try {
+    const response = await fetch(`${baseUrl}/api/auth/register`, {
       method: "POST",
-        headers: {
-        "Content-Type":"application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email: loginEmail.value,
-        password: loginPassword.value,
+        name: signupName.value,
+        email: signupEmail.value,
+        password: signupPassword.value,
       }),
-      });
+    });
 
-      const result = await response.text();
-      alert(result);
-
-    } catch(error){
-      console.error("Login error:", error);
-      alert("Anmeldung fehlgeschlagen");
+    if (!response.ok) {
+      const msg = await response.text();
+      alert(`Registrierung fehlgeschlagen: ${msg}`);
+      return;
     }
-  };
 
-  const handleSignup = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: signupName.value,
-          email: signupEmail.value,
-          password: signupPassword.value,
-        }),
-      });
+    alert("Registrierung erfolgreich");
+  } catch (error) {
+    console.error("Signup error:", error);
+    alert("Registrierung fehlgeschlagen");
+  }
+}
 
-      const result = await response.text();
-      alert(result);
-    } catch (error) {
-      console.error("Signup error:", error);
-      alert("Registrierung fehlgeschlagen");
-    }
-  };
+function handleLogout() {
+  clearBasicAuth();
+  alert("Logout erfolgreich");
+}
 </script>
 
 <template>
-  <!-- TODO: Backend einbinden, damit User gespeichert wird -->
   <main>
     <section class="feature-grid">
-      <!-- Log In -->
       <div class="feature-card">
         <h2>Log In</h2>
 
-        <input
-          type="email"
-          placeholder="E-Mail"
-          v-model="loginEmail"
-          class="input-field"
-          data-testid="login-email"
-        />
+        <input type="email" placeholder="E-Mail" v-model="loginEmail" class="input-field" />
+        <input type="password" placeholder="Passwort" v-model="loginPassword" class="input-field" />
 
-        <input
-          type="password"
-          placeholder="Passwort"
-          v-model="loginPassword"
-          class="input-field"
-          data-testid="login-password"
-        />
-
-        <button class="primary-button" data-testid="login-button"@click="handleLogin">
+        <button class="primary-button" @click="handleLogin">
           Log In
+        </button>
+
+        <button v-if="loggedIn" class="secondary-button" @click="handleLogout">
+          Logout
         </button>
       </div>
 
-      <!-- Sign Up -->
       <div class="feature-card">
         <h2>Sign Up</h2>
 
-        <input
-          type="text"
-          placeholder="Vorname, Nachname"
-          v-model="signupName"
-          class="input-field"
-          data-testid="signup-name"
-        />
+        <input type="text" placeholder="Vorname, Nachname" v-model="signupName" class="input-field" />
+        <input type="email" placeholder="E-Mail" v-model="signupEmail" class="input-field" />
+        <input type="password" placeholder="Passwort" v-model="signupPassword" class="input-field" />
 
-        <input
-          type="email"
-          placeholder="E-Mail"
-          v-model="signupEmail"
-          class="input-field"
-          data-testid="signup-email"
-        />
-
-        <input
-          type="password"
-          placeholder="Passwort"
-          v-model="signupPassword"
-          class="input-field"
-          data-testid="signup-password"
-        />
-
-        <button class="primary-button" data-testid="signup-button"@click="handleSignup">
+        <button class="primary-button" @click="handleSignup">
           Sign Up
         </button>
       </div>
@@ -171,6 +156,17 @@
   border-radius: 12px;
   padding: 1rem;
   font-size: 1.2rem;
+  cursor: pointer;
+  font-family: "Apple Braille";
+}
+
+.secondary-button {
+  background: #ddd;
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  padding: 1rem;
+  font-size: 1.1rem;
   cursor: pointer;
   font-family: "Apple Braille";
 }
