@@ -52,18 +52,36 @@ async function handleSignup() {
       }),
     });
 
+    // Body robust auslesen (kann JSON oder Text oder leer sein)
+    const contentType = res.headers.get("content-type") || "";
+    let body: any = null;
+
+    if (contentType.includes("application/json")) {
+      body = await res.json().catch(() => null);
+    } else {
+      body = await res.text().catch(() => "");
+    }
+
     if (!res.ok) {
-      const txt = await res.text();
-      alert(`Registrierung fehlgeschlagen: ${txt}`);
+      console.log("REGISTER FAILED", { status: res.status, body });
+      const msg =
+        (body && body.message) ||
+        (body && body.error) ||
+        (typeof body === "string" ? body : "") ||
+        "Unbekannter Fehler";
+
+      alert(`Registrierung fehlgeschlagen (${res.status}): ${msg}`);
       return;
     }
 
+    console.log("REGISTER OK", body);
     alert("Registrierung erfolgreich");
   } catch (e) {
-    console.error(e);
-    alert("Registrierung fehlgeschlagen");
+    console.error("REGISTER ERROR", e);
+    alert("Registrierung fehlgeschlagen (Netzwerk/CORS/Server nicht erreichbar)");
   }
 }
+
 
 function handleLogout() {
   clearToken();
