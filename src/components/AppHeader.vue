@@ -17,6 +17,7 @@ import logo from '@/assets/Logo_mitSchrift.png'
       <RouterLink to="/income">Income</RouterLink>
       <RouterLink to="/report">Report</RouterLink>
       <RouterLink to="/stocks">Stocks</RouterLink>
+      <RouterLink to="/Saving">Saving</RouterLink>
       <RouterLink to="/account">Account</RouterLink>
     </nav>
   </header>
