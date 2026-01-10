@@ -15,7 +15,8 @@ const router = createRouter({
   routes: [
   {
     path: '/home',
-    component: Home
+    component: Home,
+    meta: {hideHeader: true}
   },
   {
     path: '/Account',

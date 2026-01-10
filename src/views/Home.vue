@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {useRouter} from 'vue-router'
+import logo from '@/assets/Logo.png'
 const router = useRouter()
 function goTo (route: string){
   router.push(route)
@@ -9,118 +10,98 @@ function goTo (route: string){
 <template>
   <!-- TODO: Aussehen implementieren -->
   <main class="home">
-
-    <section class="feature-grid">
-
-      <!-- Kachel 1 -->
-      <div class="feature-card">
-        <h2>Platzhalter</h2>
-        <p>Platzhalter</p>
-        <button @click="goTo('/budgets')">
-          Öffnen
-        </button>
+    <section class="layout">
+      <!-- Links: großes Logo-Feld -->
+      <div class="logo-box">
+        <img :src="logo" alt="Logo" class="logo" />
       </div>
 
-      <!-- Kachel 2 -->
-      <div class="feature-card">
-        <h2>Platzhalter</h2>
-        <p>Platzhalter</p>
-        <button @click="goTo('/expenses')">
-          Öffnen
-        </button>
-      </div>
-
-      <!-- Kachel 3 -->
-      <div class="feature-card">
-        <h2>Platzhalter</h2>
-        <p>Platzhalter</p>
-        <button @click="goTo('/stats')">
-          Öffnen
-        </button>
-      </div>
-
-      <!-- Kachel 4 -->
-      <div class="feature-card">
-        <h2>Platzhalter</h2>
-        <p>Platzhalter</p>
-        <button @click="goTo('/settings')">
-          Öffnen
-        </button>
+      <!-- Rechts: Buttons -->
+      <div class="button-column">
+        <button class="nav-button" @click="goTo('/expenses')">Expenses</button>
+        <button class="nav-button" @click="goTo('/income')">Income</button>
+        <button class="nav-button" @click="goTo('/report')">Report</button>
+        <button class="nav-button" @click="goTo('/stocks')">Stocks</button>
+        <button class="nav-button" @click="goTo('/saving')">Savings</button>
+        <button class="nav-button" @click="goTo('/account')">Account</button>
       </div>
     </section>
-
-    <!-- Inhaltsübersicht -->
-    <section class="overview-box">
-      <h2>Platzhalter</h2>
-      <p>Kurze Inhaltsübersicht</p>
-    </section>
-
   </main>
 </template>
 
 <style scoped>
 .home {
-padding: 3rem 4rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 3rem 2rem;
+  font-family: "Apple Braille";
 }
 
-/* Grid */
-.feature-grid {
-display: grid;
-grid-template-columns: repeat(2, 1fr);
-gap: 2.5rem;
+/* Gesamt-Layout: 2 Spalten */
+.layout {
+  width: 100%;
+  max-width: 1100px;
 
-width: auto;
-margin: 0 auto 3rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
 }
 
-/* Einzelne Kachel */
-.feature-card {
-background-color: #d9d9d9;
-border: 2px solid #000;
-padding: 1.5rem;
-height: 100px;
-
-display: flex;
-flex-direction: column;
-justify-content: space-between;
+/* Links: großer Block */
+.logo-box {
+  height: 500px;
+  background: #ffffff;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
 }
 
-/* Titel */
-.feature-card h2 {
-margin: 0;
-font-size: 1.4rem;
+.logo {
+  max-width: 150%;
+  max-height: 150%;
+  object-fit: contain;
 }
 
-/* Beschreibung */
-.feature-card p {
-margin: 0.5rem 0;
-font-size: 1rem;
-color: #333;
+/* Rechts: Button-Spalte */
+.button-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 1rem;
 }
 
-/* Button mittig */
-.feature-card button {
-align-self: center;   /* ⭐ mittig */
-padding: 0.5rem 1.8rem;
-border: none;
-background-color: #000;
-color: #fff;
-cursor: pointer;
-font-size: 1rem;
+.nav-button {
+  width: 100%;
+  padding: 1.4rem 1rem;
+
+  background: #bcefbc;
+  border: 2px solid #bcffbc;
+  color: #244a22;
+
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+
+  border-radius: 16px;
 }
 
-.feature-card button:hover {
-opacity: 0.85;
+.nav-button:hover {
+  filter: brightness(1.05);
 }
 
-/* 🔽 Platzhalter-Kasten unten */
-.overview-box {
-max-width: 1100px;   /* exakt wie Grid */
-margin: 0 auto;
-padding: 2rem;
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
 
-background-color: #d9d9d9;
-border: 2px solid #000;
-height: 220px;
+  .logo-box {
+    height: 360px;
+  }
 }
 </style>
