@@ -46,3 +46,21 @@ export async function getStockChart(symbol: string): Promise<any> {
   const txt = await response.text()
   return JSON.parse(txt)
 }
+
+export async function deleteStock(id: number): Promise<void> {
+  const response = await fetch(`${baseUrl}/api/stocks/${id}`, {
+    method: 'DELETE',
+    headers: { ...authHeader() }
+  })
+
+  if (!response.ok) throw new Error('Stock konnte nicht gelöscht werden')
+}
+
+export async function clearPortfolio(): Promise<void> {
+  const response = await fetch(`${baseUrl}/api/stocks`, {
+    method: 'DELETE',
+    headers: { ...authHeader() }
+  })
+
+  if (!response.ok) throw new Error('Portfolio konnte nicht zurückgesetzt werden')
+}

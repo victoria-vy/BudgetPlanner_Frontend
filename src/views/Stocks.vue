@@ -6,7 +6,9 @@ import {
   getUserStocks,
   addStock,
   getStockQuote,
-  getStockChart
+  getStockChart,
+  deleteStock,
+  clearPortfolio
 } from '@/service/StockService'
 
 import type { Stock } from '@/models/Stock'
@@ -58,6 +60,31 @@ async function saveStock() {
   }
 }
 
+async function removeStock(stock: Stock) {
+  if (!stock.id) {
+    errorMsg.value = 'Stock hat keine ID (Backend muss getId() liefern).'
+    return
+  }
+
+  errorMsg.value = ''
+  try {
+    await deleteStock(stock.id)
+    savedStocks.value = savedStocks.value.filter(s => s.id !== stock.id)
+  } catch (e: any) {
+    errorMsg.value = e?.message ?? 'Fehler beim Löschen'
+  }
+}
+
+async function resetPortfolio() {
+  errorMsg.value = ''
+  try {
+    await clearPortfolio()
+    savedStocks.value = []
+  } catch (e: any) {
+    errorMsg.value = e?.message ?? 'Fehler beim Zurücksetzen'
+  }
+}
+
 function renderChart(data: any) {
   if (!chartCanvas.value) return
 
@@ -99,6 +126,7 @@ function renderChart(data: any) {
         <button @click="loadStockData" :disabled="!symbol.trim()">Kurs laden</button>
         <button @click="saveStock" :disabled="!symbol.trim()">Ins Portfolio</button>
         <button @click="reloadPortfolio">Portfolio neu laden</button>
+        <button class="danger" @click="resetPortfolio" :disabled="savedStocks.length === 0">Portfolio resetten</button>
       </div>
 
       <div v-if="quote" class="quote">
@@ -113,8 +141,9 @@ function renderChart(data: any) {
     <div class="card">
       <h2>Dein Portfolio</h2>
       <ul v-if="savedStocks.length">
-        <li v-for="s in savedStocks" :key="s.id ?? s.symbol">
-          {{ s.symbol }}
+        <li v-for="s in savedStocks" :key="s.id ?? s.symbol" class="stock-row">
+          <span>{{ s.symbol }}</span>
+          <button class="danger" @click="removeStock(s)">Löschen</button>
         </li>
       </ul>
       <p v-else>Noch keine Stocks gespeichert.</p>
@@ -152,6 +181,19 @@ button {
   border-radius: 10px;
   cursor: pointer;
 }
+
+.stock-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.4rem 0;
+}
+
+.danger {
+  background: #ffe3e3;
+}
+
 .error { color: red; }
 .quote { margin: 0.75rem 0; }
 </style>

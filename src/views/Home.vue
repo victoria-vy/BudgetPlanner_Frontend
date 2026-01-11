@@ -1,107 +1,291 @@
 <script setup lang="ts">
-import {useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
 import logo from '@/assets/Logo.png'
+
 const router = useRouter()
-function goTo (route: string){
+
+function goTo(route: string) {
   router.push(route)
 }
 </script>
 
 <template>
-  <!-- TODO: Aussehen implementieren -->
   <main class="home">
     <section class="layout">
-      <!-- Links: großes Logo-Feld -->
-      <div class="logo-box">
-        <img :src="logo" alt="Logo" class="logo" />
+      <!-- LEFT: Mascot + Speech Bubble -->
+      <div class="mascot-card">
+        <div class="speech">
+          <div class="speech-title">Hallo 👋</div>
+          <p class="speech-text">
+            Ich bin dein <strong>MoneyManager</strong>!<br />
+            Ich helfe dir, deine Einnahmen, Ausgaben und Sparziele im Blick zu behalten.
+          </p>
+        </div>
+
+        <div class="mascot">
+          <img :src="logo" alt="MoneyManager Logo" class="logo" />
+        </div>
       </div>
 
-      <!-- Rechts: Buttons -->
-      <div class="button-column">
-        <button class="nav-button" @click="goTo('/expenses')">Expenses</button>
-        <button class="nav-button" @click="goTo('/income')">Income</button>
-        <button class="nav-button" @click="goTo('/report')">Report</button>
-        <button class="nav-button" @click="goTo('/stocks')">Stocks</button>
-        <button class="nav-button" @click="goTo('/saving')">Savings</button>
-        <button class="nav-button" @click="goTo('/account')">Account</button>
+      <!-- RIGHT: Features -->
+      <div class="features">
+        <h1 class="headline">Was möchtest du heute machen?</h1>
+
+        <div class="feature-list">
+          <article class="feature-card">
+            <div class="feature-left">
+              <div class="feature-icon">🧾</div>
+              <div>
+                <div class="feature-title">Expenses</div>
+                <p class="feature-desc">Trage Ausgaben ein und behalte deine Kosten im Blick.</p>
+              </div>
+            </div>
+            <button class="btn" @click="goTo('/expenses')">Öffnen</button>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-left">
+              <div class="feature-icon">💶</div>
+              <div>
+                <div class="feature-title">Income</div>
+                <p class="feature-desc">Erfasse Einnahmen und sieh, wie viel dir wirklich bleibt.</p>
+              </div>
+            </div>
+            <button class="btn" @click="goTo('/income')">Öffnen</button>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-left">
+              <div class="feature-icon">🎯</div>
+              <div>
+                <div class="feature-title">Savings</div>
+                <p class="feature-desc">Lege Sparziele an und verfolge deinen Fortschritt.</p>
+              </div>
+            </div>
+            <button class="btn" @click="goTo('/saving')">Öffnen</button>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-left">
+              <div class="feature-icon">📈</div>
+              <div>
+                <div class="feature-title">Stocks</div>
+                <p class="feature-desc">Behalte dein Portfolio im Blick und speichere deine Favoriten.</p>
+              </div>
+            </div>
+            <button class="btn" @click="goTo('/stocks')">Öffnen</button>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-left">
+              <div class="feature-icon">📊</div>
+              <div>
+                <div class="feature-title">Report</div>
+                <p class="feature-desc">Sieh Auswertungen und erkenne, wo du sparen kannst.</p>
+              </div>
+            </div>
+            <button class="btn" @click="goTo('/report')">Öffnen</button>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-left">
+              <div class="feature-icon">👤</div>
+              <div>
+                <div class="feature-title">Account</div>
+                <p class="feature-desc">Login, Registrierung und später deine Profileinstellungen.</p>
+              </div>
+            </div>
+            <button class="btn" @click="goTo('/account')">Öffnen</button>
+          </article>
+        </div>
       </div>
     </section>
   </main>
 </template>
 
 <style scoped>
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 .home {
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 3rem 2rem;
+  padding: 2.5rem 2rem;
   font-family: "Apple Braille";
 }
 
-/* Gesamt-Layout: 2 Spalten */
 .layout {
   width: 100%;
   max-width: 1100px;
-
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+  grid-template-columns: 420px 1fr;
+  gap: 2rem;
   align-items: start;
 }
 
-/* Links: großer Block */
-.logo-box {
-  height: 500px;
-  background: #ffffff;
-  border: 2px solid #ffffff;
+/* LEFT card */
+.mascot-card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 18px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  position: relative;
+  min-height: 520px;
+}
+
+/* Speech bubble */
+.speech {
+  background: #f7fbff;
+  border: 1px solid #d6e9ff;
+  border-radius: 16px;
+  padding: 1rem 1rem 1.1rem;
+  position: relative;
+}
+
+.speech::after {
+  content: "";
+  position: absolute;
+  left: 34px;
+  bottom: -10px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #f7fbff;
+}
+
+.speech::before {
+  content: "";
+  position: absolute;
+  left: 33px;
+  bottom: -11px;
+  width: 0;
+  height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-top: 11px solid #d6e9ff;
+}
+
+.speech-title {
+  font-weight: 700;
+  color: #083a4b;
+  margin-bottom: 0.35rem;
+}
+
+.speech-text {
+  margin: 0;
+  color: #374151;
+  line-height: 1.35;
+}
+
+/* Mascot image area */
+.mascot {
+  margin-top: 1.25rem;
+  height: 380px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  overflow: hidden;
 }
 
 .logo {
-  max-width: 150%;
-  max-height: 150%;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
   object-fit: contain;
 }
 
-/* Rechts: Button-Spalte */
-.button-column {
+/* RIGHT */
+.features {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding-top: 1rem;
+  gap: 1rem;
 }
 
-.nav-button {
-  width: 100%;
-  padding: 1.4rem 1rem;
+.headline {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #111;
+}
 
-  background: #bcefbc;
-  border: 2px solid #bcffbc;
-  color: #244a22;
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
 
-  font-size: 1.4rem;
-  font-weight: 600;
+.feature-card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 18px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.feature-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.feature-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: #eaf3ff;
+  font-size: 1.2rem;
+}
+
+.feature-title {
+  font-weight: 700;
+  color: #083a4b;
+}
+
+.feature-desc {
+  margin: 0.15rem 0 0;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+/* Button style aligned with your project */
+.btn {
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #9ccc8f;
+  background: #b4dda5;
+  color: #000;
   cursor: pointer;
-  text-align: center;
-
-  border-radius: 16px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-.nav-button:hover {
-  filter: brightness(1.05);
+.btn:hover {
+  background: #5c9644;
+  color: #fff;
 }
 
-@media (max-width: 900px) {
+/* Mobile */
+@media (max-width: 980px) {
   .layout {
     grid-template-columns: 1fr;
-    gap: 2rem;
   }
 
-  .logo-box {
-    height: 360px;
+  .mascot-card {
+    min-height: auto;
+  }
+
+  .mascot {
+    height: 260px;
   }
 }
 </style>

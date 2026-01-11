@@ -46,7 +46,7 @@ import Budget from '@/views/Budget.vue'
 
 .header-menu a {
   color: #244a22;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   text-decoration: none;
 }
 

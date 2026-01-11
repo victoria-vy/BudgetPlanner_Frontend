@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { setToken, clearToken, isLoggedIn } from "@/service/authService.ts";
+import { setToken, clearToken, isLoggedIn, getToken } from "@/service/authService.ts";
 
 const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
@@ -30,10 +30,9 @@ async function handleLogin() {
       return;
     }
 
-    const data = await res.json(); // { token, name, email }
+    const data = await res.json();
     setToken(data.token);
     alert("Login erfolgreich");
-
   } catch (e) {
     console.error(e);
     alert("Login fehlgeschlagen");
@@ -52,7 +51,6 @@ async function handleSignup() {
       }),
     });
 
-    // Body robust auslesen (kann JSON oder Text oder leer sein)
     const contentType = res.headers.get("content-type") || "";
     let body: any = null;
 
@@ -63,7 +61,6 @@ async function handleSignup() {
     }
 
     if (!res.ok) {
-      console.log("REGISTER FAILED", { status: res.status, body });
       const msg =
         (body && body.message) ||
         (body && body.error) ||
@@ -74,14 +71,12 @@ async function handleSignup() {
       return;
     }
 
-    console.log("REGISTER OK", body);
     alert("Registrierung erfolgreich");
   } catch (e) {
     console.error("REGISTER ERROR", e);
     alert("Registrierung fehlgeschlagen (Netzwerk/CORS/Server nicht erreichbar)");
   }
 }
-
 
 function handleLogout() {
   clearToken();
@@ -90,77 +85,224 @@ function handleLogout() {
 </script>
 
 <template>
-  <main>
-    <section class="feature-grid">
-      <div class="feature-card">
+  <main class="account">
+    <header class="page-head">
+      <h1>Account</h1>
+      <p class="sub">Login & Registrierung</p>
+    </header>
+
+    <p v-if="loggedIn" class="logged-in">
+      Du bist aktuell eingeloggt.
+    </p>
+
+    <section class="grid">
+      <!-- Login -->
+      <div class="card">
         <h2>Log In</h2>
 
-        <input type="email" placeholder="E-Mail" v-model="loginEmail" class="input-field" />
-        <input type="password" placeholder="Passwort" v-model="loginPassword" class="input-field" />
+        <label class="label">E-Mail</label>
+        <input
+          type="email"
+          placeholder="name@mail.de"
+          v-model="loginEmail"
+          class="input"
+          data-testid="login-email"
+        />
 
-        <button class="primary-button" @click="handleLogin">Log In</button>
+        <label class="label">Passwort</label>
+        <input
+          type="password"
+          placeholder="••••••••"
+          v-model="loginPassword"
+          class="input"
+          data-testid="login-password"
+        />
 
-        <button v-if="loggedIn" class="secondary-button" @click="handleLogout">
-          Logout
-        </button>
+        <div class="actions">
+          <button class="btn primary" data-testid="login-button" @click="handleLogin">
+            Log In
+          </button>
+
+          <button
+            v-if="loggedIn"
+            class="btn ghost"
+            @click="handleLogout"
+          >
+            Logout
+          </button>
+        </div>
       </div>
 
-      <div class="feature-card">
+      <!-- Signup -->
+      <div class="card">
         <h2>Sign Up</h2>
 
-        <input type="text" placeholder="Vorname, Nachname" v-model="signupName" class="input-field" />
-        <input type="email" placeholder="E-Mail" v-model="signupEmail" class="input-field" />
-        <input type="password" placeholder="Passwort" v-model="signupPassword" class="input-field" />
+        <label class="label">Name</label>
+        <input
+          type="text"
+          placeholder="Vorname Nachname"
+          v-model="signupName"
+          class="input"
+          data-testid="signup-name"
+        />
 
-        <button class="primary-button" @click="handleSignup">Sign Up</button>
+        <label class="label">E-Mail</label>
+        <input
+          type="email"
+          placeholder="name@mail.de"
+          v-model="signupEmail"
+          class="input"
+          data-testid="signup-email"
+        />
+
+        <label class="label">Passwort</label>
+        <input
+          type="password"
+          placeholder="Mind. 6 Zeichen"
+          v-model="signupPassword"
+          class="input"
+          data-testid="signup-password"
+        />
+
+        <button class="btn primary" data-testid="signup-button" @click="handleSignup">
+          Sign Up
+        </button>
+
+        <p class="hint">
+          Tipp: Wenn die Registrierung klappt, kannst du dich direkt mit denselben Daten einloggen.
+        </p>
       </div>
     </section>
   </main>
 </template>
 
 <style scoped>
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 3rem;
-  max-width: 900px;
-  margin: 0 auto;
+.account {
+  width: 900px;
+  padding: 2rem;
   font-family: "Apple Braille";
 }
-.feature-card {
-  background-color: #ffffff;
-  border: 2px solid #dadada;
-  padding: 2.5rem;
-  min-height: 450px;
+
+.page-head {
+  margin-bottom: 1rem;
+}
+
+.page-head h1 {
+  margin: 0;
+}
+
+.sub {
+  margin: 0.25rem 0 0;
+  color: #4b5563;
+}
+
+.logged-in {
+  margin: 0.75rem 0 1.25rem;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  border: 1px solid #e5e5e5;
+  background: #f7fbff;
+  color: #083a4b;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 18px;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.5rem;
 }
-.input-field {
-  background-color: #e4e4e4;
+
+
+.card h2 {
+  margin: 0 0 1rem;
+}
+
+/* Form */
+.label {
+  display: block;
+  margin: 0.5rem 0 0.25rem;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.input {
+  width: 100%;
+  max-width: 100%;
+  padding: 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-size: 1rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #9cc8ff;
+}
+
+/* Buttons */
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  align-items: center;
+}
+
+.btn {
   border: none;
   border-radius: 12px;
-  padding: 1rem;
-  font-size: 1.1rem;
-  font-family: "Apple Braille";
-}
-.primary-button {
-  margin-top: auto;
-  background-color: #b4dda5;
-  border: none;
-  border-radius: 12px;
-  padding: 1rem;
-  font-size: 1.2rem;
+  padding: 0.85rem 1rem;
   cursor: pointer;
-  font-family: "Apple Braille";
+  font-size: 1.05rem;
 }
-.secondary-button {
-  background: #ddd;
-  border: none;
-  border-radius: 12px;
-  padding: 1rem;
-  font-size: 1.1rem;
-  cursor: pointer;
-  font-family: "Apple Braille";
+
+.primary {
+  background: #b4dda5;
+  color: #000;
 }
+
+.primary:hover {
+  background: #5c9644;
+  color: white;
+}
+
+.ghost {
+  background: #f1f1f1;
+}
+
+.ghost:hover {
+  background: #e6e6e6;
+}
+
+.hint {
+  margin-top: 1rem;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+/* Responsive wie Savings */
+@media (max-width: 980px) {
+  .account {
+    width: 100%;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 </style>
