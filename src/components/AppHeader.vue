@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import logo from '@/assets/Logo.png'
+import Budget from '@/views/Budget.vue'
 </script>
 
 <template>
@@ -15,6 +16,7 @@ import logo from '@/assets/Logo.png'
         <!-- Mitte (zentriertes Menü) -->
         <div class="header-center">
           <RouterLink to="/home">Home</RouterLink>
+          <RouterLink to="/Budget">Budget</RouterLink>
           <RouterLink to="/expenses">Expenses</RouterLink>
           <RouterLink to="/income">Income</RouterLink>
           <RouterLink to="/report">Report</RouterLink>

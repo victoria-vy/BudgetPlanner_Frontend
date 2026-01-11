@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import type { SavingsGoal } from '@/models/SavingsGoal'
-import { createSavingsGoal, deleteSavingsGoal, getSavingsGoals, updateSavingsGoal } from '@/service/SavingsService'
+import { onMounted, ref } from 'vue'
+import type { SavingsGoal, SavingsCategory } from '@/models/SavingsGoal'
+import {
+  createSavingsGoal,
+  deleteSavingsGoal,
+  getSavingsGoals,
+  updateSavingsGoal
+} from '@/service/savingsService.ts'
 
 const goals = ref<SavingsGoal[]>([])
 const errorMsg = ref('')
@@ -9,6 +14,18 @@ const errorMsg = ref('')
 const newTitle = ref('')
 const newTarget = ref<number>(0)
 const newCurrent = ref<number>(0)
+const newCategory = ref<SavingsCategory>('OTHER')
+
+const CATEGORY_OPTIONS: { value: SavingsCategory; label: string }[] = [
+  { value: 'HOME', label: 'Wohnen' },
+  { value: 'TRAVEL', label: 'Reise' },
+  { value: 'CAR', label: 'Auto' },
+  { value: 'EDUCATION', label: 'Bildung' },
+  { value: 'EMERGENCY', label: 'Notgroschen' },
+  { value: 'GIFTS', label: 'Geschenke' },
+  { value: 'TECH', label: 'Technik' },
+  { value: 'OTHER', label: 'Sonstiges' }
+]
 
 onMounted(load)
 
@@ -28,7 +45,27 @@ function percent(goal: SavingsGoal) {
 }
 
 function formatEuro(v: number) {
-  return v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+  return (
+    v.toLocaleString('de-DE', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + ' €'
+  )
+}
+
+function iconForGoal(goal: SavingsGoal): string {
+  const title = goal.title.toLowerCase()
+
+  if (title.includes('reise') || title.includes('urlaub')) return '✈️'
+  if (title.includes('auto') || title.includes('wagen')) return '🚗'
+  if (title.includes('haus') || title.includes('wohnung')) return '🏠'
+  if (title.includes('hochzeit')) return '💍'
+  if (title.includes('technik') || title.includes('laptop') || title.includes('handy')) return '💻'
+  if (title.includes('festival') || title.includes('konzert')) return '🎶'
+  if (title.includes('notgroschen') || title.includes('reserve')) return '🛟'
+  if (title.includes('bildung') || title.includes('studium')) return '🎓'
+
+  return '💰' // Default
 }
 
 async function addGoal() {
@@ -37,12 +74,16 @@ async function addGoal() {
     const created = await createSavingsGoal({
       title: newTitle.value,
       targetAmount: newTarget.value,
-      currentAmount: newCurrent.value
+      currentAmount: newCurrent.value,
+      category: newCategory.value
     })
+
     goals.value.unshift(created)
+
     newTitle.value = ''
     newTarget.value = 0
     newCurrent.value = 0
+    newCategory.value = 'OTHER'
   } catch (e: any) {
     errorMsg.value = e?.message ?? 'Fehler beim Erstellen'
   }
@@ -50,18 +91,28 @@ async function addGoal() {
 
 async function addAmount(goal: SavingsGoal, delta: number) {
   if (!goal.id) return
+
   const updated: SavingsGoal = {
     ...goal,
     currentAmount: Math.max(0, goal.currentAmount + delta)
   }
-  const saved = await updateSavingsGoal(goal.id, updated)
-  goals.value = goals.value.map(g => (g.id === goal.id ? saved : g))
+
+  try {
+    const saved = await updateSavingsGoal(goal.id, updated)
+    goals.value = goals.value.map((g) => (g.id === goal.id ? saved : g))
+  } catch (e: any) {
+    errorMsg.value = e?.message ?? 'Fehler beim Aktualisieren'
+  }
 }
 
 async function remove(goal: SavingsGoal) {
   if (!goal.id) return
-  await deleteSavingsGoal(goal.id)
-  goals.value = goals.value.filter(g => g.id !== goal.id)
+  try {
+    await deleteSavingsGoal(goal.id)
+    goals.value = goals.value.filter((g) => g.id !== goal.id)
+  } catch (e: any) {
+    errorMsg.value = e?.message ?? 'Fehler beim Löschen'
+  }
 }
 </script>
 
@@ -74,10 +125,32 @@ async function remove(goal: SavingsGoal) {
     <!-- New Goal -->
     <section class="new-goal card">
       <h2>Neues Sparziel</h2>
+
       <div class="row">
         <input v-model="newTitle" placeholder="Titel (z.B. Sommer-Festival-Reise)" />
-        <input v-model.number="newCurrent" type="number" min="0" step="0.01" placeholder="Schon gespart (€)" />
-        <input v-model.number="newTarget" type="number" min="1" step="0.01" placeholder="Ziel (€)" />
+
+        <select v-model="newCategory" class="select">
+          <option v-for="o in CATEGORY_OPTIONS" :key="o.value" :value="o.value">
+            {{ o.label }}
+          </option>
+        </select>
+
+        <input
+          v-model.number="newCurrent"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="Schon gespart (€)"
+        />
+
+        <input
+          v-model.number="newTarget"
+          type="number"
+          min="1"
+          step="0.01"
+          placeholder="Ziel (€)"
+        />
+
         <button @click="addGoal" :disabled="!newTitle || newTarget <= 0">Anlegen</button>
       </div>
     </section>
@@ -87,13 +160,14 @@ async function remove(goal: SavingsGoal) {
       <article v-for="g in goals" :key="g.id ?? g.title" class="goal-card">
         <div class="top">
           <div class="left">
-            <div class="icon">🏠</div>
+            <div class="icon">{{ iconForGoal(g) }}</div>
             <div class="title">{{ g.title }}</div>
           </div>
+
           <div class="amount">{{ formatEuro(g.currentAmount) }}</div>
         </div>
 
-        <!-- Strich-Progressbar wie im Bild -->
+        <!-- Strich-Progressbar -->
         <div class="bar">
           <div class="bar-fill" :style="{ width: percent(g) + '%' }"></div>
         </div>
@@ -122,8 +196,11 @@ async function remove(goal: SavingsGoal) {
   padding: 2rem;
   font-family: "Apple Braille";
 }
-.error { color: red; }
+.error {
+  color: red;
+}
 
+/* Cards */
 .card {
   background: #fff;
   border: 1px solid #e5e5e5;
@@ -132,17 +209,22 @@ async function remove(goal: SavingsGoal) {
   margin-bottom: 1rem;
 }
 
+/* New Goal Row */
 .row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr auto;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto; /* ⭐ mit Kategorie */
   gap: 0.75rem;
   align-items: center;
 }
-input {
+
+input,
+.select {
   padding: 0.8rem;
   border-radius: 12px;
   border: 1px solid #ddd;
+  background: white;
 }
+
 button {
   padding: 0.8rem 1rem;
   border-radius: 12px;
@@ -150,7 +232,11 @@ button {
   cursor: pointer;
 }
 
-.goals { display: flex; flex-direction: column; gap: 1rem; }
+.goals {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
 .goal-card {
   background: #fff;
@@ -165,11 +251,13 @@ button {
   align-items: center;
   gap: 1rem;
 }
+
 .left {
   display: flex;
   align-items: center;
   gap: 0.6rem;
 }
+
 .icon {
   width: 34px;
   height: 34px;
@@ -179,36 +267,42 @@ button {
   background: #eaf3ff;
   color: #1f6feb;
 }
-.title { font-size: 1.1rem; }
-.amount { font-weight: 700; color: #1f6feb; }
 
-/* Strich-Bar Look (wie im Beispiel) */
+.title {
+  font-size: 1.1rem;
+}
+
+.amount {
+  font-weight: 700;
+  color: #1f6feb;
+}
+
+/* Strich-Bar */
 .bar {
   margin: 0.75rem 0 0.4rem;
   height: 16px;
   border-radius: 999px;
-  background:
-    repeating-linear-gradient(
-      90deg,
-      #d6e9ff 0px,
-      #d6e9ff 3px,
-      transparent 3px,
-      transparent 7px
-    );
+  background: repeating-linear-gradient(
+    90deg,
+    #d6e9ff 0px,
+    #d6e9ff 3px,
+    transparent 3px,
+    transparent 7px
+  );
   overflow: hidden;
   position: relative;
 }
+
 .bar-fill {
   height: 100%;
   border-radius: 999px;
-  background:
-    repeating-linear-gradient(
-      90deg,
-      #4ea1ff 0px,
-      #4ea1ff 3px,
-      transparent 3px,
-      transparent 7px
-    );
+  background: repeating-linear-gradient(
+    90deg,
+    #4ea1ff 0px,
+    #4ea1ff 3px,
+    transparent 3px,
+    transparent 7px
+  );
 }
 
 .bottom {
@@ -217,13 +311,34 @@ button {
   font-size: 0.95rem;
   color: #4b5563;
 }
-.pct { color: #111; font-weight: 600; }
+
+.pct {
+  color: #111;
+  font-weight: 600;
+}
 
 .actions {
   margin-top: 0.75rem;
   display: flex;
   gap: 0.5rem;
 }
-.danger { background: #ffe3e3; }
-.empty { color: #666; }
+
+.danger {
+  background: #ffe3e3;
+}
+
+.empty {
+  color: #666;
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .savings {
+    width: 100%;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

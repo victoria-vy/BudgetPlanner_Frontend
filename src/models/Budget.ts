@@ -1,5 +1,14 @@
+export type BudgetCategory =
+  | 'FOOD'
+  | 'RENT'
+  | 'FUN'
+  | 'TRAVEL'
+  | 'TECH'
+  | 'OTHER'
+
 export interface Budget {
   id?: number
   month: string
-  limit: number
+  limitAmount: number
+  category: BudgetCategory
 }
