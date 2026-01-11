@@ -74,7 +74,7 @@ async function remove(id?: number) {
           <option value="OTHER">💰 Sonstiges</option>
         </select>
 
-        <button @click="add" :disabled="!title || amount <= 0">Anlegen</button>
+        <button @click="add" :disabled="!title || amount <= 0" data-testid="add-income ">Anlegen</button>
       </div>
     </section>
 
@@ -90,7 +90,7 @@ async function remove(id?: number) {
 
         <div class="right">
           <strong class="plus">+ {{ i.amount }} €</strong>
-          <button class="danger" @click="remove(i.id)">Löschen</button>
+          <button class="danger" @click="remove(i.id)"data-testid="delete-income">Löschen</button>
         </div>
       </article>
 

@@ -6,14 +6,20 @@ import { nextTick } from "vue";
 beforeEach(() => {
   vi.restoreAllMocks();
 
+  vi.stubEnv("VITE_BACKEND_BASE_URL", "http://localhost:8080"); // <-- hier statt import.meta.env = ...
+
   global.fetch = vi.fn(() =>
     Promise.resolve({
       text: () => Promise.resolve("Erfolg"),
+      ok: true,
+      json: () => Promise.resolve({ token: "abc123" }),
     } as Response)
   ) as any;
 
   global.alert = vi.fn();
 });
+
+
 
 describe("Account", () => {
   it("sendet Login-Daten korrekt", async () => {
