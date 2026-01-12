@@ -16,8 +16,12 @@ async function load() {
   errorMsg.value = ''
   try {
     items.value = await getIncome()
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? 'Fehler'
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      errorMsg.value = e.message
+    } else {
+      errorMsg.value = 'Fehler'
+    }
   }
 }
 
@@ -42,9 +46,14 @@ async function add() {
     title.value = ''
     amount.value = 0
     category.value = 'SALARY'
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? 'Fehler beim Speichern'
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      errorMsg.value = e.message
+    } else {
+      errorMsg.value = 'Fehler beim Speichern'
+    }
   }
+
 }
 
 async function remove(id?: number) {
@@ -74,7 +83,7 @@ async function remove(id?: number) {
           <option value="OTHER">💰 Sonstiges</option>
         </select>
 
-        <button @click="add" :disabled="!title || amount <= 0" data-testid="add-income ">Anlegen</button>
+        <button @click="add" :disabled="!title || amount <= 0" data-testid="add-income">Anlegen</button>
       </div>
     </section>
 
@@ -90,7 +99,7 @@ async function remove(id?: number) {
 
         <div class="right">
           <strong class="plus">+ {{ i.amount }} €</strong>
-          <button class="danger" @click="remove(i.id)"data-testid="delete-income">Löschen</button>
+          <button class="danger" @click="remove(i.id)" data-testid="delete-income">Löschen</button>
         </div>
       </article>
 
