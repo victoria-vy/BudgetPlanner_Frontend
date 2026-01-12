@@ -220,7 +220,7 @@ function goTo(route: string) {
 }
 
 .feature-card {
-  background: #fff;
+  background: #ffffff;
   border: 1px solid #e5e5e5;
   border-radius: 18px;
   padding: 1rem;
