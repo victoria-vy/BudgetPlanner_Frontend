@@ -13,12 +13,13 @@ function goTo(route: string) {
   <main class="home">
     <section class="layout">
       <!-- LEFT: Mascot + Speech Bubble -->
-      <div class="mascot-card">
+      <div class="panel mascot-card">
         <div class="speech">
           <div class="speech-title">Hallo 👋</div>
           <p class="speech-text">
             Ich bin dein <strong>MoneyManager</strong>!<br />
-            Ich helfe dir, deine Einnahmen, Ausgaben und Sparziele im Blick zu behalten.
+            Ich helfe dir, deine Einnahmen, Ausgaben und Sparziele im Blick zu behalten.<br /><br />
+            👉 Starte am besten mit <strong>Account</strong> (Login/Registrierung).
           </p>
         </div>
 
@@ -28,11 +29,21 @@ function goTo(route: string) {
       </div>
 
       <!-- RIGHT: Features -->
-      <div class="features">
-        <h1 class="headline">Was möchtest du heute machen?</h1>
-
         <div class="feature-list">
-          <article class="feature-card">
+          <!-- Budget -->
+          <article class="feature-card" role="button" tabindex="0" @click="goTo('/budget')">
+            <div class="feature-left">
+              <div class="feature-icon">💼</div>
+              <div>
+                <div class="feature-title">Budgets</div>
+                <p class="feature-desc">Erstelle monatliche Budgets, um deine Ausgaben zu kontrollieren.</p>
+              </div>
+            </div>
+            <span class="cta">Öffnen</span>
+          </article>
+
+          <!-- Expenses -->
+          <article class="feature-card" role="button" tabindex="0" @click="goTo('/expenses')">
             <div class="feature-left">
               <div class="feature-icon">🧾</div>
               <div>
@@ -40,10 +51,11 @@ function goTo(route: string) {
                 <p class="feature-desc">Trage Ausgaben ein und behalte deine Kosten im Blick.</p>
               </div>
             </div>
-            <button class="btn" @click="goTo('/expenses')">Öffnen</button>
+            <span class="cta">Öffnen</span>
           </article>
 
-          <article class="feature-card">
+          <!-- Income -->
+          <article class="feature-card" role="button" tabindex="0" @click="goTo('/income')">
             <div class="feature-left">
               <div class="feature-icon">💶</div>
               <div>
@@ -51,10 +63,11 @@ function goTo(route: string) {
                 <p class="feature-desc">Erfasse Einnahmen und sieh, wie viel dir wirklich bleibt.</p>
               </div>
             </div>
-            <button class="btn" @click="goTo('/income')">Öffnen</button>
+            <span class="cta">Öffnen</span>
           </article>
 
-          <article class="feature-card">
+          <!-- Savings -->
+          <article class="feature-card" role="button" tabindex="0" @click="goTo('/saving')">
             <div class="feature-left">
               <div class="feature-icon">🎯</div>
               <div>
@@ -62,21 +75,23 @@ function goTo(route: string) {
                 <p class="feature-desc">Lege Sparziele an und verfolge deinen Fortschritt.</p>
               </div>
             </div>
-            <button class="btn" @click="goTo('/saving')">Öffnen</button>
+            <span class="cta">Öffnen</span>
           </article>
 
-          <article class="feature-card">
+          <!-- Stocks -->
+          <article class="feature-card" role="button" tabindex="0" @click="goTo('/stocks')">
             <div class="feature-left">
               <div class="feature-icon">📈</div>
               <div>
                 <div class="feature-title">Stocks</div>
-                <p class="feature-desc">Behalte dein Portfolio im Blick und speichere deine Favoriten.</p>
+                <p class="feature-desc">Speichere Aktien und verwalte dein Portfolio.</p>
               </div>
             </div>
-            <button class="btn" @click="goTo('/stocks')">Öffnen</button>
+            <span class="cta">Öffnen</span>
           </article>
 
-          <article class="feature-card">
+          <!-- Report -->
+          <article class="feature-card" role="button" tabindex="0" @click="goTo('/report')">
             <div class="feature-left">
               <div class="feature-icon">📊</div>
               <div>
@@ -84,10 +99,11 @@ function goTo(route: string) {
                 <p class="feature-desc">Sieh Auswertungen und erkenne, wo du sparen kannst.</p>
               </div>
             </div>
-            <button class="btn" @click="goTo('/report')">Öffnen</button>
+            <span class="cta">Öffnen</span>
           </article>
 
-          <article class="feature-card">
+          <!-- Account -->
+          <article class="feature-card" role="button" tabindex="0" @click="goTo('/account')">
             <div class="feature-left">
               <div class="feature-icon">👤</div>
               <div>
@@ -95,13 +111,13 @@ function goTo(route: string) {
                 <p class="feature-desc">Login, Registrierung und später deine Profileinstellungen.</p>
               </div>
             </div>
-            <button class="btn" @click="goTo('/account')">Öffnen</button>
+            <span class="cta">Öffnen</span>
           </article>
         </div>
-      </div>
     </section>
   </main>
 </template>
+
 
 <style scoped>
 *,
@@ -110,32 +126,44 @@ function goTo(route: string) {
   box-sizing: border-box;
 }
 
+/* Seite zentriert */
 .home {
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: center;      /* horizontal */
+  align-items: center;          /* vertikal */
   padding: 2.5rem 2rem;
   font-family: "Apple Braille";
 }
 
+/* Grid: beide Spalten gleich hoch */
 .layout {
   width: 100%;
   max-width: 1100px;
+
   display: grid;
   grid-template-columns: 420px 1fr;
   gap: 2rem;
-  align-items: start;
+
+  align-items: stretch;
 }
 
-/* LEFT card */
-.mascot-card {
+/* Gemeinsamer Panel-Look (links + rechts) */
+.mascot-card,
+.features {
   background: #fff;
   border: 1px solid #e5e5e5;
   border-radius: 18px;
   padding: 1.25rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-  position: relative;
-  min-height: 520px;
+
+  height: 100%;
+}
+
+/* LEFT: Inhalt sauber verteilen */
+.mascot-card {
+  display: flex;
+  flex-direction: column;
 }
 
 /* Speech bubble */
@@ -183,10 +211,10 @@ function goTo(route: string) {
   line-height: 1.35;
 }
 
-/* Mascot image area */
+/* Mascot area: nach unten drücken, damit Card voll genutzt wird */
 .mascot {
-  margin-top: 1.25rem;
-  height: 380px;
+  margin-top: 45px;
+  height: 260px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -217,6 +245,10 @@ function goTo(route: string) {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
+
+  /* wenn viele Items: bleibt Panel-Höhe gleich, Liste scrollt */
+  overflow: auto;
+  padding-right: 0.25rem;
 }
 
 .feature-card {
@@ -224,10 +256,19 @@ function goTo(route: string) {
   border: 1px solid #e5e5e5;
   border-radius: 18px;
   padding: 1rem;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10);
 }
 
 .feature-left {
@@ -257,7 +298,23 @@ function goTo(route: string) {
   font-size: 0.95rem;
 }
 
-/* Button style aligned with your project */
+/* Öffnen-Badge (falls du das verwendest) */
+.cta {
+  padding: 0.55rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid #9ccc8f;
+  background: #b4dda5;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.feature-card:hover .cta {
+  background: #5c9644;
+  color: #fff;
+  border-color: #5c9644;
+}
+
+/* Falls du noch Buttons nutzt */
 .btn {
   padding: 0.8rem 1rem;
   border-radius: 12px;
@@ -276,16 +333,21 @@ function goTo(route: string) {
 
 /* Mobile */
 @media (max-width: 980px) {
+  .home {
+    align-items: flex-start;
+  }
+
   .layout {
     grid-template-columns: 1fr;
   }
 
-  .mascot-card {
-    min-height: auto;
+  .mascot {
+    height: 240px;
   }
 
-  .mascot {
-    height: 260px;
+  .feature-list {
+    overflow: visible;
   }
 }
 </style>
+

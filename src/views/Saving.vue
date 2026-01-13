@@ -212,7 +212,7 @@ async function remove(goal: SavingsGoal) {
 /* New Goal Row */
 .row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr auto; /* ⭐ mit Kategorie */
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
   gap: 0.75rem;
   align-items: center;
 }
@@ -321,6 +321,7 @@ button {
   margin-top: 0.75rem;
   display: flex;
   gap: 0.5rem;
+  align-items: center;
 }
 
 .danger {

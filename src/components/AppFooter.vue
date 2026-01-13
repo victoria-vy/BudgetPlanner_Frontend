@@ -5,7 +5,7 @@
   <footer class="footer">
 
     <nav class="footer-menu">
-      <p class="copyright">© 2025 BudgetPlaner</p>
+      <p class="copyright">© 2025 MoneyManager</p>
       <RouterLink to="/impressum">Impressum</RouterLink>
       <RouterLink to="/datenschutzerklärung">Datenschutzerklärung</RouterLink>
       <RouterLink to="/agb">AGB</RouterLink>
@@ -18,17 +18,17 @@
 
 <style scoped>
 .footer {
-  display: flex;                 /* Flexbox aktivieren */
-  justify-content: space-between; /* Menü links, Copyright rechts */
-  align-items: center;           /* vertikal zentrieren */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   max-width: 900px;
-  margin: 2rem auto 0;           /* oben Abstand, zentriert */
+  margin: 2rem auto 0;
   font-family: "Apple Braille";
 }
 
 .footer-menu {
   display: flex;
-  gap: 2rem;                     /* Abstand zwischen Links */
+  gap: 2rem;
 }
 
 .footer-menu a {
@@ -42,7 +42,7 @@
 }
 
 .footer p {
-  margin: 0;                     /* verhindert unerwünschten Abstand */
+  margin: 0;
   font-size: 0.9rem;
   color: #000000;
 }
