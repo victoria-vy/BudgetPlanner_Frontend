@@ -1,92 +1,129 @@
 <script setup lang="ts">
-import { onMounted, ref, nextTick} from 'vue'
-import Chart from 'chart.js/auto'
-import { getReport } from '@/service/reportService'
-import type { ReportResponse } from '@/models/Report'
+import { onMounted, onBeforeUnmount, ref, nextTick } from "vue";
+import Chart from "chart.js/auto";
+import { getReport } from "@/service/reportService";
+import type { ReportResponse } from "@/models/Report";
 
-const month = ref(new Date().toISOString().slice(0, 7)) // YYYY-MM
-const data = ref<ReportResponse | null>(null)
-const errorMsg = ref('')
+const month = ref(new Date().toISOString().slice(0, 7)); // YYYY-MM
+const data = ref<ReportResponse | null>(null);
+const errorMsg = ref("");
 
-const barCanvas = ref<HTMLCanvasElement | null>(null)
-const pieCanvas = ref<HTMLCanvasElement | null>(null)
-let barChart: Chart | null = null
-let pieChart: Chart | null = null
+const barCanvas = ref<HTMLCanvasElement | null>(null);
+const pieCanvas = ref<HTMLCanvasElement | null>(null);
+let barChart: Chart | null = null;
+let pieChart: Chart | null = null;
 
-onMounted(load)
+onMounted(load);
+
+// ✅ sorgt dafür, dass immer YYYY-MM an dein Backend geht
+function normalizeMonth(input: string): string {
+  const s = (input ?? "").trim();
+
+  // z.B. 2026-01-14 -> 2026-01
+  const matchDate = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (matchDate) {
+    const y = matchDate[1];
+    const m = matchDate[2].padStart(2, "0");
+    return `${y}-${m}`;
+  }
+
+  // z.B. 2026-1 -> 2026-01
+  const matchMonth = s.match(/^(\d{4})-(\d{1,2})$/);
+  if (matchMonth) {
+    const y = matchMonth[1];
+    const m = matchMonth[2].padStart(2, "0");
+    return `${y}-${m}`;
+  }
+
+  // passt schon
+  if (/^\d{4}-\d{2}$/.test(s)) return s;
+
+  // fallback: original (Backend kann dann Fehler melden)
+  return s;
+}
 
 async function load() {
-  errorMsg.value = ''
+  errorMsg.value = "";
   try {
-    data.value = await getReport(month.value)
-    await nextTick()
-    renderCharts()
+    month.value = normalizeMonth(month.value); // ✅ immer korrekt formatieren
+    data.value = await getReport(month.value);
+    await nextTick();
+    renderCharts();
   } catch (e: any) {
-    errorMsg.value = e?.message ?? 'Fehler'
+    errorMsg.value = e?.message ?? "Fehler";
   }
 }
 
 function renderCharts() {
-  if (!data.value) return
+  if (!data.value) return;
 
-  const labels = data.value.rows.map(r => r.category)
-  const budget = data.value.rows.map(r => r.budgetLimit)
-  const spent = data.value.rows.map(r => r.spent)
+  const labels = data.value.rows.map((r) => r.category);
+  const budget = data.value.rows.map((r) => r.budgetLimit);
+  const spent = data.value.rows.map((r) => r.spent);
 
   // Bar chart
   if (barCanvas.value) {
-    if (barChart) barChart.destroy()
+    if (barChart) barChart.destroy();
     barChart = new Chart(barCanvas.value, {
-      type: 'bar',
+      type: "bar",
       data: {
         labels,
         datasets: [
-          { label: 'Budget', data: budget },
-          { label: 'Ausgaben', data: spent }
-        ]
+          { label: "Budget", data: budget },
+          { label: "Ausgaben", data: spent },
+        ],
       },
-      options: { responsive: true, maintainAspectRatio: false }
-    })
+      options: {
+        responsive: true,
+        maintainAspectRatio: false, // ✅ bleibt in der Box
+      },
+    });
   }
 
   // Pie chart (nur Ausgaben > 0)
   if (pieCanvas.value) {
-    const spentRows = data.value.rows.filter(r => r.spent > 0)
-    const pieLabels = spentRows.map(r => r.category)
-    const pieData = spentRows.map(r => r.spent)
+    const spentRows = data.value.rows.filter((r) => r.spent > 0);
+    const pieLabels = spentRows.map((r) => r.category);
+    const pieData = spentRows.map((r) => r.spent);
 
-    if (pieChart) pieChart.destroy()
+    if (pieChart) pieChart.destroy();
     pieChart = new Chart(pieCanvas.value, {
-      type: 'doughnut',
+      type: "doughnut",
       data: {
         labels: pieLabels,
         datasets: [
           {
-            label: 'Ausgaben',
+            label: "Ausgaben",
             data: pieData,
             borderWidth: 2,
-            radius: '90%',
-            cutout: '60%'
-          }
-        ]
+            radius: "90%",
+            cutout: "60%",
+          },
+        ],
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
+        maintainAspectRatio: false, // ✅ bleibt in der Box
         plugins: {
-          legend: {
-            position: 'bottom'
-          }
-        }
-      }
-    })
-
-
+          legend: { position: "bottom" },
+        },
+      },
+    });
   }
 }
 
+// ✅ Cleanup, damit Charts nicht „aus der Box springen“ nach Navigation
+onBeforeUnmount(() => {
+  if (barChart) barChart.destroy();
+  if (pieChart) pieChart.destroy();
+  barChart = null;
+  pieChart = null;
+});
+
 function euro(v: number) {
-  return v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+  return (
+    v.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €"
+  );
 }
 </script>
 
@@ -100,7 +137,7 @@ function euro(v: number) {
     <section class="card">
       <h2>Monat auswählen</h2>
       <div class="row">
-        <input v-model="month" placeholder="YYYY-MM" />
+        <input v-model="month" placeholder="YYYY-MM" @blur="month = normalizeMonth(month)" />
         <button @click="load">Laden</button>
       </div>
     </section>
@@ -237,7 +274,7 @@ button {
   gap: 1rem;
 }
 
-/* ⭐ Wichtig: Karte bekommt feste Höhe, Canvas füllt sie */
+/* Karte feste Höhe, Canvas füllt sie */
 .chart-card {
   height: 360px;
   display: flex;
@@ -248,7 +285,6 @@ button {
   margin: 0 0 0.75rem 0;
 }
 
-/* Canvas nimmt den restlichen Platz ein */
 .chart-card canvas {
   flex: 1;
   width: 100% !important;
@@ -261,5 +297,4 @@ button {
   .summary { flex-direction: column; }
   .chart-card { height: 320px; }
 }
-
 </style>

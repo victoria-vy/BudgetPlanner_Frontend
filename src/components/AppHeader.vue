@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import logo from '@/assets/Logo.png'
-import Budget from '@/views/Budget.vue'
+import account from '@/assets/Account.png'
 </script>
 
 <template>
@@ -19,14 +19,16 @@ import Budget from '@/views/Budget.vue'
           <RouterLink to="/Budget">Budget</RouterLink>
           <RouterLink to="/expenses">Expenses</RouterLink>
           <RouterLink to="/income">Income</RouterLink>
-          <RouterLink to="/report">Report</RouterLink>
           <RouterLink to="/stocks">Stocks</RouterLink>
           <RouterLink to="/saving">Saving</RouterLink>
+          <RouterLink to="/report">Report</RouterLink>
         </div>
 
         <!-- Rechts (leer oder Account später) -->
         <div class="header-right">
-          <RouterLink to="/account">Account</RouterLink>
+          <RouterLink to="/account" class="account-link">
+            <img :src="account" alt="Account" class="account-icon" />
+          </RouterLink>
         </div>
       </nav>
 
@@ -74,6 +76,24 @@ import Budget from '@/views/Budget.vue'
 /* Rechts */
 .header-right {
   justify-self: end;
+}
+
+.account-link {
+  display: flex;
+  align-items: center;
+}
+
+.account-icon {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%; /* optional, z.B. für Profilbild */
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.account-icon:hover {
+  transform: scale(1.05);
+  opacity: 0.85;
 }
 
 </style>

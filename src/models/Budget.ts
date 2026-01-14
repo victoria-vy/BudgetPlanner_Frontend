@@ -11,4 +11,5 @@ export interface Budget {
   month: string
   limitAmount: number
   category: BudgetCategory
+  title?: string
 }

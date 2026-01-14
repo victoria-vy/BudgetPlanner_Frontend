@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { setToken, clearToken, isLoggedIn, getToken } from "@/service/authService.ts";
+import { ref, computed, onMounted } from "vue";
+import { setToken, clearToken, isLoggedIn } from "@/service/authService";
+import { useRouter, useRoute } from "vue-router";
 
 const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
@@ -13,13 +14,41 @@ const signupPassword = ref("");
 
 const loggedIn = computed(() => isLoggedIn());
 
+const router = useRouter();
+const route = useRoute();
+
+// Wenn du die Warnung IMMER sehen willst:
+const showLoginHint = ref(true);
+
+// einfache E-Mail-Validierung (Frontend UX)
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+onMounted(() => {
+  if (isLoggedIn()) router.replace("/Profile");
+
+  // Falls du die Warnung doch nur bei Redirect willst, dann:
+//  showLoginHint.value = route.query.reason === "login_required";
+});
+
 async function handleLogin() {
   try {
+    // ✅ Frontend Validation
+    if (!isValidEmail(loginEmail.value)) {
+      alert("Bitte eine gültige E-Mail-Adresse eingeben.");
+      return;
+    }
+    if (!loginPassword.value.trim()) {
+      alert("Bitte Passwort eingeben.");
+      return;
+    }
+
     const res = await fetch(`${baseUrl}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email: loginEmail.value,
+        email: loginEmail.value.trim(),
         password: loginPassword.value,
       }),
     });
@@ -33,6 +62,7 @@ async function handleLogin() {
     const data = await res.json();
     setToken(data.token);
     alert("Login erfolgreich");
+    await router.push("/Profile");
   } catch (e) {
     console.error(e);
     alert("Login fehlgeschlagen");
@@ -41,12 +71,26 @@ async function handleLogin() {
 
 async function handleSignup() {
   try {
+    //Frontend Validation
+    if (!signupName.value.trim()) {
+      alert("Bitte Name eingeben.");
+      return;
+    }
+    if (!isValidEmail(signupEmail.value)) {
+      alert("Bitte eine gültige E-Mail-Adresse eingeben.");
+      return;
+    }
+    if ((signupPassword.value ?? "").length < 6) {
+      alert("Passwort muss mindestens 6 Zeichen haben.");
+      return;
+    }
+
     const res = await fetch(`${baseUrl}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: signupName.value,
-        email: signupEmail.value,
+        name: signupName.value.trim(),
+        email: signupEmail.value.trim(),
         password: signupPassword.value,
       }),
     });
@@ -64,6 +108,7 @@ async function handleSignup() {
       const msg =
         (body && body.message) ||
         (body && body.error) ||
+        (body && body.details) ||
         (typeof body === "string" ? body : "") ||
         "Unbekannter Fehler";
 
@@ -72,6 +117,9 @@ async function handleSignup() {
     }
 
     alert("Registrierung erfolgreich");
+    // Optional: direkt in Login-Felder übernehmen
+    loginEmail.value = signupEmail.value.trim();
+    loginPassword.value = signupPassword.value;
   } catch (e) {
     console.error("REGISTER ERROR", e);
     alert("Registrierung fehlgeschlagen (Netzwerk/CORS/Server nicht erreichbar)");
@@ -90,6 +138,11 @@ function handleLogout() {
       <h1>Account</h1>
       <p class="sub">Login & Registrierung</p>
     </header>
+
+    <!-- Dauerhafte Warnung (wie du es wolltest) -->
+    <p v-if="showLoginHint" class="logged-in warning">
+      Bitte logge dich ein, um diese Seite zu sehen.
+    </p>
 
     <p v-if="loggedIn" class="logged-in">
       Du bist aktuell eingeloggt.
@@ -123,11 +176,7 @@ function handleLogout() {
             Log In
           </button>
 
-          <button
-            v-if="loggedIn"
-            class="btn ghost"
-            @click="handleLogout"
-          >
+          <button v-if="loggedIn" class="btn ghost" @click="handleLogout">
             Logout
           </button>
         </div>
@@ -205,6 +254,12 @@ function handleLogout() {
   color: #083a4b;
 }
 
+.warning {
+  background: #fff7ed;
+  border-color: #fed7aa;
+  color: #9a3412;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -221,12 +276,10 @@ function handleLogout() {
   gap: 0.5rem;
 }
 
-
 .card h2 {
   margin: 0 0 1rem;
 }
 
-/* Form */
 .label {
   display: block;
   margin: 0.5rem 0 0.25rem;
@@ -249,7 +302,6 @@ function handleLogout() {
   border-color: #9cc8ff;
 }
 
-/* Buttons */
 .actions {
   display: flex;
   gap: 0.75rem;
@@ -289,7 +341,6 @@ function handleLogout() {
   font-size: 0.95rem;
 }
 
-/* Responsive wie Savings */
 @media (max-width: 980px) {
   .account {
     width: 100%;
@@ -304,5 +355,4 @@ function handleLogout() {
 *::after {
   box-sizing: border-box;
 }
-
 </style>

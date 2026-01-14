@@ -1,58 +1,123 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import type { Expense, ExpenseCategory } from '@/models/Expense'
-import { getExpenses, createExpense, deleteExpense } from '@/service/expenseService'
+import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+import type { Expense, ExpenseCategory } from "@/models/Expense";
+import { getExpenses, createExpense, deleteExpense } from "@/service/expenseService";
 
-const items = ref<Expense[]>([])
-const errorMsg = ref('')
+const items = ref<Expense[]>([]);
+const errorMsg = ref("");
 
-const title = ref('')
-const amount = ref<number>(0)
-const category = ref<ExpenseCategory>('FOOD')
+const title = ref("");
+const category = ref<ExpenseCategory>("FOOD");
 
-onMounted(load)
+// ✅ Betrag als String für freie Eingabe + Placeholder
+const amountText = ref<string>("");
+
+// Presets fürs Dropdown (anpassen wie du willst)
+const amountPresets = [5, 10, 20, 50, 100, 200, 300];
+
+// --- Dropdown State ---
+const catOpen = ref(false);
+const amountOpen = ref(false);
+
+function closeAll() {
+  catOpen.value = false;
+  amountOpen.value = false;
+}
+
+function onDocClick(e: MouseEvent) {
+  const t = e.target as HTMLElement | null;
+  if (!t) return;
+  if (!t.closest(".dd")) closeAll();
+}
+
+onMounted(() => {
+  load();
+  document.addEventListener("click", onDocClick);
+});
+onBeforeUnmount(() => {
+  document.removeEventListener("click", onDocClick);
+});
 
 async function load() {
-  errorMsg.value = ''
+  errorMsg.value = "";
   try {
-    items.value = await getExpenses()
+    items.value = await getExpenses();
   } catch (e: any) {
-    errorMsg.value = e?.message ?? 'Fehler'
+    errorMsg.value = e?.message ?? "Fehler";
   }
 }
+
+// ✅ Parse Betrag (akzeptiert auch Komma)
+const amountNumber = computed(() => {
+  const raw = amountText.value.trim().replace(",", ".");
+  if (!raw) return 0;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : 0;
+});
+
+const canCreate = computed(() => {
+  return title.value.trim() !== "" && amountNumber.value > 0;
+});
 
 function iconForCategory(cat: ExpenseCategory) {
   switch (cat) {
-    case 'FOOD': return '🍔'
-    case 'RENT': return '🏠'
-    case 'FUN': return '🎉'
-    case 'TRAVEL': return '✈️'
-    case 'TECH': return '💻'
-    default: return '💰'
+    case "FOOD": return "🍔";
+    case "RENT": return "🏠";
+    case "FUN": return "🎉";
+    case "TRAVEL": return "✈️";
+    case "TECH": return "💻";
+    case "OTHER": return "💰";
+    default: return "💰";
   }
 }
 
+function labelForCategory(cat: ExpenseCategory) {
+  switch (cat) {
+    case "FOOD": return "Essen";
+    case "RENT": return "Miete";
+    case "FUN": return "Freizeit";
+    case "TRAVEL": return "Reisen";
+    case "TECH": return "Technik";
+    case "OTHER": return "Sonstiges";
+    default: return "Sonstiges";
+  }
+}
+
+// Optional: nur "saubere" Zeichen erlauben (Zahlen, Punkt, Komma)
+function sanitizeAmountInput() {
+  amountText.value = amountText.value.replace(/[^\d.,]/g, "");
+}
+
+function setPresetAmount(v: number) {
+  // Anzeige mit optionalen Dezimalstellen
+  amountText.value = String(v);
+  amountOpen.value = false;
+}
+
 async function add() {
-  errorMsg.value = ''
+  errorMsg.value = "";
   try {
     const created = await createExpense({
       title: title.value,
-      amount: amount.value,
-      category: category.value
-    })
-    items.value.unshift(created)
-    title.value = ''
-    amount.value = 0
-    category.value = 'FOOD'
+      amount: amountNumber.value,
+      category: category.value,
+    });
+
+    items.value.unshift(created);
+
+    title.value = "";
+    amountText.value = "";
+    category.value = "FOOD";
+    closeAll();
   } catch (e: any) {
-    errorMsg.value = e?.message ?? 'Fehler beim Speichern'
+    errorMsg.value = e?.message ?? "Fehler beim Speichern";
   }
 }
 
 async function remove(id?: number) {
-  if (!id) return
-  await deleteExpense(id)
-  items.value = items.value.filter(i => i.id !== id)
+  if (!id) return;
+  await deleteExpense(id);
+  items.value = items.value.filter((i) => i.id !== id);
 }
 </script>
 
@@ -67,18 +132,66 @@ async function remove(id?: number) {
 
       <div class="row">
         <input v-model="title" placeholder="Titel (z.B. Einkauf)" />
-        <input v-model.number="amount" type="number" min="0" step="0.01" placeholder="Betrag (€)" />
 
-        <select v-model="category">
-          <option value="FOOD">🍔 Essen</option>
-          <option value="RENT">🏠 Miete</option>
-          <option value="FUN">🎉 Freizeit</option>
-          <option value="TRAVEL">✈️ Reisen</option>
-          <option value="TECH">💻 Technik</option>
-          <option value="OTHER">💰 Sonstiges</option>
-        </select>
+        <!-- ✅ Betrag: editierbar + Dropdown Presets -->
+        <div class="dd">
+          <div class="combo">
+            <input
+              v-model="amountText"
+              class="combo-input"
+              inputmode="decimal"
+              placeholder="Betrag (€)"
+              @input="sanitizeAmountInput"
+              @focus="amountOpen = false"
+            />
+            <button
+              class="combo-arrow"
+              type="button"
+              aria-label="Betrag auswählen"
+              @click="amountOpen = !amountOpen; catOpen = false"
+            >
+              ▾
+            </button>
+          </div>
 
-        <button @click="add" :disabled="!title || amount <= 0">Anlegen</button>
+          <div v-if="amountOpen" class="dd-menu">
+            <button
+              v-for="p in amountPresets"
+              :key="p"
+              type="button"
+              class="dd-item"
+              @click="setPresetAmount(p)"
+            >
+              {{ p }} €
+            </button>
+          </div>
+        </div>
+
+        <!-- ✅ Kategorie Dropdown (wie Budget) -->
+        <div class="dd">
+          <button
+            class="field dd-btn"
+            type="button"
+            @click="catOpen = !catOpen; amountOpen = false"
+          >
+            <span class="dd-left">
+              <span class="dd-icon">{{ iconForCategory(category) }}</span>
+              <span>{{ labelForCategory(category) }}</span>
+            </span>
+            <span class="arrow">▾</span>
+          </button>
+
+          <div v-if="catOpen" class="dd-menu">
+            <button type="button" class="dd-item" @click="category = 'FOOD'; catOpen = false">🍔 Essen</button>
+            <button type="button" class="dd-item" @click="category = 'RENT'; catOpen = false">🏠 Miete</button>
+            <button type="button" class="dd-item" @click="category = 'FUN'; catOpen = false">🎉 Freizeit</button>
+            <button type="button" class="dd-item" @click="category = 'TRAVEL'; catOpen = false">✈️ Reisen</button>
+            <button type="button" class="dd-item" @click="category = 'TECH'; catOpen = false">💻 Technik</button>
+            <button type="button" class="dd-item" @click="category = 'OTHER'; catOpen = false">💰 Sonstiges</button>
+          </div>
+        </div>
+
+        <button @click="add" :disabled="!canCreate">Anlegen</button>
       </div>
     </section>
 
@@ -88,7 +201,11 @@ async function remove(id?: number) {
           <span class="icon">{{ iconForCategory(e.category) }}</span>
           <div>
             <div class="cat">{{ e.title }}</div>
-            <small>{{ e.category }} <span v-if="e.date">• {{ e.date }}</span></small>
+            <!-- ✅ Kategorie Deutsch -->
+            <small>
+              {{ labelForCategory(e.category) }}
+              <span v-if="e.date">• {{ e.date }}</span>
+            </small>
           </div>
         </div>
 
@@ -109,7 +226,10 @@ async function remove(id?: number) {
   padding: 2rem;
   font-family: "Apple Braille";
 }
-.error { color: red; }
+
+.error {
+  color: red;
+}
 
 .card {
   background: #fff;
@@ -126,10 +246,112 @@ async function remove(id?: number) {
   align-items: center;
 }
 
-input, select {
+/* ✅ Einheitliche Höhe */
+input {
+  height: 52px;
   padding: 0.8rem;
   border-radius: 12px;
   border: 1px solid #ddd;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+/* Dropdown Wrapper */
+.dd {
+  position: relative;
+  width: 100%;
+}
+
+/* Kategorie Button wie Budget */
+.field {
+  height: 52px;
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
+.dd-left {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.dd-icon {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+}
+
+.arrow {
+  opacity: 0.8;
+}
+
+/* ✅ Betrag Combo: Input + Pfeil */
+.combo {
+  height: 52px;
+  display: grid;
+  grid-template-columns: 1fr 44px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.combo-input {
+  height: 100%;
+  border: none;
+  outline: none;
+  padding: 0.8rem;
+  background: transparent;
+}
+
+.combo-arrow {
+  height: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+.combo-arrow:hover {
+  background: #f3f4f6;
+}
+
+/* Dropdown Menu */
+.dd-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 50;
+}
+
+.dd-item {
+  width: 100%;
+  padding: 0.8rem;
+  text-align: left;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.dd-item:hover {
+  background: #f3f4f6;
 }
 
 button {
@@ -139,7 +361,11 @@ button {
   cursor: pointer;
 }
 
-.list { display: flex; flex-direction: column; gap: 1rem; }
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
 .item-card {
   background: #fff;
@@ -151,7 +377,11 @@ button {
   align-items: center;
 }
 
-.left { display: flex; align-items: center; gap: 0.75rem; }
+.left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
 
 .icon {
   width: 36px;
@@ -163,14 +393,37 @@ button {
   font-size: 1.2rem;
 }
 
-.cat { font-weight: 600; }
+.cat {
+  font-weight: 600;
+}
 
-.right { display: flex; align-items: center; gap: 1rem; }
+.right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
 
-.minus { color: #b91c1c; }
+.minus {
+  color: #b91c1c;
+}
 
-.danger { background: #ffe3e3; }
+.danger {
+  background: #ffe3e3;
+}
 
-.empty { color: #666; }
+.empty {
+  color: #666;
+}
+
+@media (max-width: 980px) {
+  .page {
+    width: 100%;
+  }
+  .row {
+    grid-template-columns: 1fr;
+  }
+  button {
+    width: 100%;
+  }
+}
 </style>
-

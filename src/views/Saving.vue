@@ -1,117 +1,179 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import type { SavingsGoal, SavingsCategory } from '@/models/SavingsGoal'
+import { onMounted, ref, computed, onBeforeUnmount } from "vue";
+import type { SavingsGoal, SavingsCategory } from "@/models/SavingsGoal";
 import {
   createSavingsGoal,
   deleteSavingsGoal,
   getSavingsGoals,
-  updateSavingsGoal
-} from '@/service/savingsService.ts'
+  updateSavingsGoal,
+} from "@/service/savingsService.ts";
 
-const goals = ref<SavingsGoal[]>([])
-const errorMsg = ref('')
+const goals = ref<SavingsGoal[]>([]);
+const errorMsg = ref("");
 
-const newTitle = ref('')
-const newTarget = ref<number>(0)
-const newCurrent = ref<number>(0)
-const newCategory = ref<SavingsCategory>('OTHER')
+// ✅ statt number=0 -> leer starten
+const newTitle = ref("");
+const newTargetText = ref<string>("");
+const newCurrentText = ref<string>("");
+const newCategory = ref<SavingsCategory>("OTHER");
 
-const CATEGORY_OPTIONS: { value: SavingsCategory; label: string }[] = [
-  { value: 'HOME', label: 'Wohnen' },
-  { value: 'TRAVEL', label: 'Reise' },
-  { value: 'CAR', label: 'Auto' },
-  { value: 'EDUCATION', label: 'Bildung' },
-  { value: 'EMERGENCY', label: 'Notgroschen' },
-  { value: 'GIFTS', label: 'Geschenke' },
-  { value: 'TECH', label: 'Technik' },
-  { value: 'OTHER', label: 'Sonstiges' }
-]
+// Presets (anpassbar)
+const currentPresets = [10, 25, 50, 100, 200, 500];
+const targetPresets = [100, 250, 500, 1000, 2000, 5000, 10000];
 
-onMounted(load)
+// Dropdown state
+const catOpen = ref(false);
+const currentOpen = ref(false);
+const targetOpen = ref(false);
+
+function closeAll() {
+  catOpen.value = false;
+  currentOpen.value = false;
+  targetOpen.value = false;
+}
+
+function onDocClick(e: MouseEvent) {
+  const t = e.target as HTMLElement | null;
+  if (!t) return;
+  if (!t.closest(".dd")) closeAll();
+}
+
+onMounted(() => {
+  load();
+  document.addEventListener("click", onDocClick);
+});
+onBeforeUnmount(() => {
+  document.removeEventListener("click", onDocClick);
+});
 
 async function load() {
-  errorMsg.value = ''
+  errorMsg.value = "";
   try {
-    goals.value = await getSavingsGoals()
+    goals.value = await getSavingsGoals();
   } catch (e: any) {
-    errorMsg.value = e?.message ?? 'Fehler'
+    errorMsg.value = e?.message ?? "Fehler";
   }
 }
 
 function percent(goal: SavingsGoal) {
-  if (goal.targetAmount <= 0) return 0
-  const p = (goal.currentAmount / goal.targetAmount) * 100
-  return Math.max(0, Math.min(100, Math.round(p)))
+  if (goal.targetAmount <= 0) return 0;
+  const p = (goal.currentAmount / goal.targetAmount) * 100;
+  return Math.max(0, Math.min(100, Math.round(p)));
 }
 
 function formatEuro(v: number) {
   return (
-    v.toLocaleString('de-DE', {
+    v.toLocaleString("de-DE", {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }) + ' €'
-  )
+      maximumFractionDigits: 2,
+    }) + " €"
+  );
 }
 
-function iconForGoal(goal: SavingsGoal): string {
-  const title = goal.title.toLowerCase()
-
-  if (title.includes('reise') || title.includes('urlaub')) return '✈️'
-  if (title.includes('auto') || title.includes('wagen')) return '🚗'
-  if (title.includes('haus') || title.includes('wohnung')) return '🏠'
-  if (title.includes('hochzeit')) return '💍'
-  if (title.includes('technik') || title.includes('laptop') || title.includes('handy')) return '💻'
-  if (title.includes('festival') || title.includes('konzert')) return '🎶'
-  if (title.includes('notgroschen') || title.includes('reserve')) return '🛟'
-  if (title.includes('bildung') || title.includes('studium')) return '🎓'
-
-  return '💰' // Default
+// ✅ Emoji pro Kategorie
+function iconForCategory(cat: SavingsCategory): string {
+  switch (cat) {
+    case "HOME": return "🏠";
+    case "TRAVEL": return "✈️";
+    case "CAR": return "🚗";
+    case "EDUCATION": return "🎓";
+    case "EMERGENCY": return "🛟";
+    case "GIFTS": return "🎁";
+    case "TECH": return "💻";
+    case "OTHER": return "💰";
+    default: return "💰";
+  }
 }
+
+function labelForCategory(cat: SavingsCategory): string {
+  switch (cat) {
+    case "HOME": return "Wohnen";
+    case "TRAVEL": return "Reise";
+    case "CAR": return "Auto";
+    case "EDUCATION": return "Bildung";
+    case "EMERGENCY": return "Notgroschen";
+    case "GIFTS": return "Geschenke";
+    case "TECH": return "Technik";
+    case "OTHER": return "Sonstiges";
+    default: return "Sonstiges";
+  }
+}
+
+// ✅ Parse (Komma erlaubt)
+function parseEuro(text: string) {
+  const raw = text.trim().replace(",", ".");
+  if (!raw) return 0;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : 0;
+}
+
+const newCurrent = computed(() => parseEuro(newCurrentText.value));
+const newTarget = computed(() => parseEuro(newTargetText.value));
+
+function sanitizeEuroInput(which: "current" | "target") {
+  if (which === "current") newCurrentText.value = newCurrentText.value.replace(/[^\d.,]/g, "");
+  else newTargetText.value = newTargetText.value.replace(/[^\d.,]/g, "");
+}
+
+function setPreset(which: "current" | "target", v: number) {
+  if (which === "current") {
+    newCurrentText.value = String(v);
+    currentOpen.value = false;
+  } else {
+    newTargetText.value = String(v);
+    targetOpen.value = false;
+  }
+}
+
+const canCreate = computed(() => {
+  return newTitle.value.trim() !== "" && newTarget.value > 0;
+});
 
 async function addGoal() {
-  errorMsg.value = ''
+  errorMsg.value = "";
   try {
     const created = await createSavingsGoal({
       title: newTitle.value,
       targetAmount: newTarget.value,
       currentAmount: newCurrent.value,
-      category: newCategory.value
-    })
+      category: newCategory.value,
+    });
 
-    goals.value.unshift(created)
+    goals.value.unshift(created);
 
-    newTitle.value = ''
-    newTarget.value = 0
-    newCurrent.value = 0
-    newCategory.value = 'OTHER'
+    newTitle.value = "";
+    newTargetText.value = "";
+    newCurrentText.value = "";
+    newCategory.value = "OTHER";
+    closeAll();
   } catch (e: any) {
-    errorMsg.value = e?.message ?? 'Fehler beim Erstellen'
+    errorMsg.value = e?.message ?? "Fehler beim Erstellen";
   }
 }
 
 async function addAmount(goal: SavingsGoal, delta: number) {
-  if (!goal.id) return
+  if (!goal.id) return;
 
   const updated: SavingsGoal = {
     ...goal,
-    currentAmount: Math.max(0, goal.currentAmount + delta)
-  }
+    currentAmount: Math.max(0, goal.currentAmount + delta),
+  };
 
   try {
-    const saved = await updateSavingsGoal(goal.id, updated)
-    goals.value = goals.value.map((g) => (g.id === goal.id ? saved : g))
+    const saved = await updateSavingsGoal(goal.id, updated);
+    goals.value = goals.value.map((g) => (g.id === goal.id ? saved : g));
   } catch (e: any) {
-    errorMsg.value = e?.message ?? 'Fehler beim Aktualisieren'
+    errorMsg.value = e?.message ?? "Fehler beim Aktualisieren";
   }
 }
 
 async function remove(goal: SavingsGoal) {
-  if (!goal.id) return
+  if (!goal.id) return;
   try {
-    await deleteSavingsGoal(goal.id)
-    goals.value = goals.value.filter((g) => g.id !== goal.id)
+    await deleteSavingsGoal(goal.id);
+    goals.value = goals.value.filter((g) => g.id !== goal.id);
   } catch (e: any) {
-    errorMsg.value = e?.message ?? 'Fehler beim Löschen'
+    errorMsg.value = e?.message ?? "Fehler beim Löschen";
   }
 }
 </script>
@@ -129,29 +191,101 @@ async function remove(goal: SavingsGoal) {
       <div class="row">
         <input v-model="newTitle" placeholder="Titel (z.B. Sommer-Festival-Reise)" />
 
-        <select v-model="newCategory" class="select">
-          <option v-for="o in CATEGORY_OPTIONS" :key="o.value" :value="o.value">
-            {{ o.label }}
-          </option>
-        </select>
+        <!-- ✅ Schon gespart: Combo -->
+        <div class="dd">
+          <div class="combo">
+            <input
+              v-model="newCurrentText"
+              class="combo-input"
+              inputmode="decimal"
+              placeholder="Schon gespart (€)"
+              @input="sanitizeEuroInput('current')"
+              @focus="currentOpen = false"
+            />
+            <button
+              class="combo-arrow"
+              type="button"
+              aria-label="Schon gespart auswählen"
+              @click="currentOpen = !currentOpen; targetOpen = false; catOpen = false"
+            >
+              ▾
+            </button>
+          </div>
 
-        <input
-          v-model.number="newCurrent"
-          type="number"
-          min="0"
-          step="0.01"
-          placeholder="Schon gespart (€)"
-        />
+          <div v-if="currentOpen" class="dd-menu">
+            <button
+              v-for="p in currentPresets"
+              :key="'c' + p"
+              type="button"
+              class="dd-item"
+              @click="setPreset('current', p)"
+            >
+              {{ p }} €
+            </button>
+          </div>
+        </div>
 
-        <input
-          v-model.number="newTarget"
-          type="number"
-          min="1"
-          step="0.01"
-          placeholder="Ziel (€)"
-        />
+        <!-- ✅ Ziel: Combo -->
+        <div class="dd">
+          <div class="combo">
+            <input
+              v-model="newTargetText"
+              class="combo-input"
+              inputmode="decimal"
+              placeholder="Ziel (€)"
+              @input="sanitizeEuroInput('target')"
+              @focus="targetOpen = false"
+            />
+            <button
+              class="combo-arrow"
+              type="button"
+              aria-label="Ziel auswählen"
+              @click="targetOpen = !targetOpen; currentOpen = false; catOpen = false"
+            >
+              ▾
+            </button>
+          </div>
 
-        <button @click="addGoal" :disabled="!newTitle || newTarget <= 0">Anlegen</button>
+          <div v-if="targetOpen" class="dd-menu">
+            <button
+              v-for="p in targetPresets"
+              :key="'t' + p"
+              type="button"
+              class="dd-item"
+              @click="setPreset('target', p)"
+            >
+              {{ p }} €
+            </button>
+          </div>
+        </div>
+
+        <!-- ✅ Kategorie: ganz rechts vor Button -->
+        <div class="dd">
+          <button
+            class="field dd-btn"
+            type="button"
+            @click="catOpen = !catOpen; currentOpen = false; targetOpen = false"
+          >
+            <span class="dd-left">
+              <span class="dd-icon">{{ iconForCategory(newCategory) }}</span>
+              <span>{{ labelForCategory(newCategory) }}</span>
+            </span>
+            <span class="arrow">▾</span>
+          </button>
+
+          <div v-if="catOpen" class="dd-menu">
+            <button type="button" class="dd-item" @click="newCategory = 'HOME'; catOpen = false">🏠 Wohnen</button>
+            <button type="button" class="dd-item" @click="newCategory = 'TRAVEL'; catOpen = false">✈️ Reise</button>
+            <button type="button" class="dd-item" @click="newCategory = 'CAR'; catOpen = false">🚗 Auto</button>
+            <button type="button" class="dd-item" @click="newCategory = 'EDUCATION'; catOpen = false">🎓 Bildung</button>
+            <button type="button" class="dd-item" @click="newCategory = 'EMERGENCY'; catOpen = false">🛟 Notgroschen</button>
+            <button type="button" class="dd-item" @click="newCategory = 'GIFTS'; catOpen = false">🎁 Geschenke</button>
+            <button type="button" class="dd-item" @click="newCategory = 'TECH'; catOpen = false">💻 Technik</button>
+            <button type="button" class="dd-item" @click="newCategory = 'OTHER'; catOpen = false">💰 Sonstiges</button>
+          </div>
+        </div>
+
+        <button @click="addGoal" :disabled="!canCreate">Anlegen</button>
       </div>
     </section>
 
@@ -160,14 +294,13 @@ async function remove(goal: SavingsGoal) {
       <article v-for="g in goals" :key="g.id ?? g.title" class="goal-card">
         <div class="top">
           <div class="left">
-            <div class="icon">{{ iconForGoal(g) }}</div>
+            <div class="icon">{{ iconForCategory(g.category) }}</div>
             <div class="title">{{ g.title }}</div>
           </div>
 
           <div class="amount">{{ formatEuro(g.currentAmount) }}</div>
         </div>
 
-        <!-- Strich-Progressbar -->
         <div class="bar">
           <div class="bar-fill" :style="{ width: percent(g) + '%' }"></div>
         </div>
@@ -179,10 +312,14 @@ async function remove(goal: SavingsGoal) {
         </div>
 
         <div class="actions">
-          <button @click="addAmount(g, 10)">+10€</button>
-          <button @click="addAmount(g, 50)">+50€</button>
+          <div class="actions-left">
+            <button @click="addAmount(g, 10)">+10€</button>
+            <button @click="addAmount(g, 50)">+50€</button>
+          </div>
+
           <button class="danger" @click="remove(g)">Löschen</button>
         </div>
+
       </article>
 
       <p v-if="goals.length === 0" class="empty">Noch keine Sparziele vorhanden.</p>
@@ -209,7 +346,7 @@ async function remove(goal: SavingsGoal) {
   margin-bottom: 1rem;
 }
 
-/* New Goal Row */
+/* ✅ New Goal Row: Kategorie ganz rechts vor Button */
 .row {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr auto;
@@ -217,12 +354,110 @@ async function remove(goal: SavingsGoal) {
   align-items: center;
 }
 
-input,
-.select {
+/* Einheitliche Höhe */
+input {
+  height: 52px;
   padding: 0.8rem;
   border-radius: 12px;
   border: 1px solid #ddd;
-  background: white;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+/* Dropdown Wrapper */
+.dd {
+  position: relative;
+  width: 100%;
+}
+
+/* Kategorie Button */
+.field {
+  height: 52px;
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
+.dd-left {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.dd-icon {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+}
+
+.arrow {
+  opacity: 0.8;
+}
+
+/* ✅ Combo: Input + Pfeil */
+.combo {
+  height: 52px;
+  display: grid;
+  grid-template-columns: 1fr 44px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.combo-input {
+  height: 100%;
+  border: none;
+  outline: none;
+  padding: 0.8rem;
+  background: transparent;
+}
+
+.combo-arrow {
+  height: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+.combo-arrow:hover {
+  background: #f3f4f6;
+}
+
+/* Dropdown Menu */
+.dd-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 50;
+}
+
+.dd-item {
+  width: 100%;
+  padding: 0.8rem;
+  text-align: left;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+}
+.dd-item:hover {
+  background: #f3f4f6;
 }
 
 button {
@@ -265,7 +500,6 @@ button {
   display: grid;
   place-items: center;
   background: #eaf3ff;
-  color: #1f6feb;
 }
 
 .title {
@@ -319,13 +553,20 @@ button {
 
 .actions {
   margin-top: 0.75rem;
-  display: flex;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* links | frei | rechts */
   align-items: center;
 }
 
+.actions-left {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-start; /* ganz links */
+}
+
 .danger {
-  background: #ffe3e3;
+  justify-self: end; /* ganz rechts */
+  background-color: #ffe3e3;
 }
 
 .empty {
@@ -340,6 +581,19 @@ button {
 
   .row {
     grid-template-columns: 1fr;
+  }
+
+  .actions {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .actions-left {
+    justify-content: center;
+  }
+
+  .danger {
+    justify-self: stretch;
   }
 }
 </style>
