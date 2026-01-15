@@ -44,6 +44,26 @@ button, input, select, textarea {
   display: flex;
   justify-content: center;
 }
+
+.btn-add {
+  background: #b4dda5;
+  color: #000;
+}
+
+.btn-add:hover {
+  background: #b4dda5;
+  color: #fff;
+}
+
+.btn-delete {
+  background: #f1a6a6;
+  color: #000;
+}
+
+.btn-delete:hover {
+  background: #f1a6a6;
+  color: #fff;
+}
 </style>
 
 

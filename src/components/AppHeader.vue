@@ -5,15 +5,16 @@ import account from '@/assets/Account.png'
 
 <template>
   <header class="header">
-    <!-- Mitte -->
+
 
       <nav class="header-menu">
-        <!-- Links -->
+
+        //Logo
         <div class="header-left">
           <img :src="logo" alt="Logo" class="logo" />
         </div>
 
-        <!-- Mitte (zentriertes Menü) -->
+        //Menü
         <div class="header-center">
           <RouterLink to="/home">Home</RouterLink>
           <RouterLink to="/Budget">Budget</RouterLink>
@@ -24,7 +25,7 @@ import account from '@/assets/Account.png'
           <RouterLink to="/report">Report</RouterLink>
         </div>
 
-        <!-- Rechts (leer oder Account später) -->
+        //Account
         <div class="header-right">
           <RouterLink to="/account" class="account-link">
             <img :src="account" alt="Account" class="account-icon" />

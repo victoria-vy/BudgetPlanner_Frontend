@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { setToken, clearToken, isLoggedIn } from "@/service/authService";
-import { useRouter, useRoute } from "vue-router";
+import { useRouter } from "vue-router";
 
 const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
@@ -15,12 +15,11 @@ const signupPassword = ref("");
 const loggedIn = computed(() => isLoggedIn());
 
 const router = useRouter();
-const route = useRoute();
 
-// Wenn du die Warnung IMMER sehen willst:
+//Warnung wird immer angezeigt
 const showLoginHint = ref(true);
 
-// einfache E-Mail-Validierung (Frontend UX)
+//einfache E-Mail-Validierung
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
@@ -28,8 +27,6 @@ function isValidEmail(email: string) {
 onMounted(() => {
   if (isLoggedIn()) router.replace("/Profile");
 
-  // Falls du die Warnung doch nur bei Redirect willst, dann:
-//  showLoginHint.value = route.query.reason === "login_required";
 });
 
 async function handleLogin() {
@@ -117,7 +114,7 @@ async function handleSignup() {
     }
 
     alert("Registrierung erfolgreich");
-    // Optional: direkt in Login-Felder übernehmen
+
     loginEmail.value = signupEmail.value.trim();
     loginPassword.value = signupPassword.value;
   } catch (e) {
@@ -139,7 +136,7 @@ function handleLogout() {
       <p class="sub">Login & Registrierung</p>
     </header>
 
-    <!-- Dauerhafte Warnung (wie du es wolltest) -->
+    //Dauerhafte Warnung
     <p v-if="showLoginHint" class="logged-in warning">
       Bitte logge dich ein, um die anderen Funktionen zu nutzen.
     </p>
@@ -149,7 +146,8 @@ function handleLogout() {
     </p>
 
     <section class="grid">
-      <!-- Login -->
+
+      //Login
       <div class="card">
         <h2>Log In</h2>
 
@@ -182,7 +180,7 @@ function handleLogout() {
         </div>
       </div>
 
-      <!-- Signup -->
+      //Signup
       <div class="card">
         <h2>Sign Up</h2>
 
