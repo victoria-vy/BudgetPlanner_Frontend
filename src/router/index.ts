@@ -42,7 +42,7 @@ const router = createRouter({
       component: Datenschutzerklärung,
     },
 
-    // ✅ Protected (nur eingeloggt)
+    //Protected (nur eingeloggt)
     {
       path: "/Profile",
       component: Profile,

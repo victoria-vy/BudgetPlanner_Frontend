@@ -141,7 +141,7 @@ function handleLogout() {
 
     <!-- Dauerhafte Warnung (wie du es wolltest) -->
     <p v-if="showLoginHint" class="logged-in warning">
-      Bitte logge dich ein, um diese Seite zu sehen.
+      Bitte logge dich ein, um die anderen Funktionen zu nutzen.
     </p>
 
     <p v-if="loggedIn" class="logged-in">
