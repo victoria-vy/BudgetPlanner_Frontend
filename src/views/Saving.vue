@@ -11,7 +11,7 @@ import {
 const goals = ref<SavingsGoal[]>([]);
 const errorMsg = ref("");
 
-// ✅ statt number=0 -> leer starten
+// statt number=0 -> leer starten
 const newTitle = ref("");
 const newTargetText = ref<string>("");
 const newCurrentText = ref<string>("");
@@ -70,7 +70,7 @@ function formatEuro(v: number) {
   );
 }
 
-// ✅ Emoji pro Kategorie
+// Emoji pro Kategorie
 function iconForCategory(cat: SavingsCategory): string {
   switch (cat) {
     case "HOME": return "🏠";
@@ -99,7 +99,7 @@ function labelForCategory(cat: SavingsCategory): string {
   }
 }
 
-// ✅ Parse (Komma erlaubt)
+// Parse (Komma erlaubt)
 function parseEuro(text: string) {
   const raw = text.trim().replace(",", ".");
   if (!raw) return 0;
@@ -191,7 +191,7 @@ async function remove(goal: SavingsGoal) {
       <div class="row">
         <input v-model="newTitle" placeholder="Titel (z.B. Sommer-Festival-Reise)" />
 
-        <!-- ✅ Schon gespart: Combo -->
+        <!--  Schon gespart: Combo -->
         <div class="dd">
           <div class="combo">
             <input
@@ -225,7 +225,7 @@ async function remove(goal: SavingsGoal) {
           </div>
         </div>
 
-        <!-- ✅ Ziel: Combo -->
+        <!-- Ziel: Combo -->
         <div class="dd">
           <div class="combo">
             <input
@@ -259,7 +259,7 @@ async function remove(goal: SavingsGoal) {
           </div>
         </div>
 
-        <!-- ✅ Kategorie: ganz rechts vor Button -->
+        <!-- Kategorie: ganz rechts vor Button -->
         <div class="dd">
           <button
             class="field dd-btn"
@@ -346,7 +346,7 @@ async function remove(goal: SavingsGoal) {
   margin-bottom: 1rem;
 }
 
-/* ✅ New Goal Row: Kategorie ganz rechts vor Button */
+/* New Goal Row: Kategorie ganz rechts vor Button */
 .row {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr auto;
@@ -404,7 +404,7 @@ input {
   opacity: 0.8;
 }
 
-/* ✅ Combo: Input + Pfeil */
+/* Combo: Input + Pfeil */
 .combo {
   height: 52px;
   display: grid;

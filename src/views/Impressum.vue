@@ -3,7 +3,7 @@
 <template>
   <main class="legal">
     <h1>Impressum</h1>
-    <p>Hier kommt dein Impressum rein.</p>
+    <p></p>
   </main>
 </template>
 

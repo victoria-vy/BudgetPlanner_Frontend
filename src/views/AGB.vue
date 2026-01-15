@@ -3,7 +3,7 @@
 <template>
   <main class="legal">
     <h1>Allgemeine Geschäftsbedingungen</h1>
-    <p>Hier kommen deine AGBs rein.</p>
+    <p></p>
   </main>
 </template>
 

@@ -66,18 +66,6 @@ function goTo(route: string) {
             <span class="cta">Öffnen</span>
           </article>
 
-          <!-- Savings -->
-          <article class="feature-card" role="button" tabindex="0" @click="goTo('/saving')">
-            <div class="feature-left">
-              <div class="feature-icon">🎯</div>
-              <div>
-                <div class="feature-title">Savings</div>
-                <p class="feature-desc">Lege Sparziele an und verfolge deinen Fortschritt.</p>
-              </div>
-            </div>
-            <span class="cta">Öffnen</span>
-          </article>
-
           <!-- Stocks -->
           <article class="feature-card" role="button" tabindex="0" @click="goTo('/stocks')">
             <div class="feature-left">
@@ -85,6 +73,18 @@ function goTo(route: string) {
               <div>
                 <div class="feature-title">Stocks</div>
                 <p class="feature-desc">Speichere Aktien und verwalte dein Portfolio.</p>
+              </div>
+            </div>
+            <span class="cta">Öffnen</span>
+          </article>
+
+          <!-- Savings -->
+          <article class="feature-card" role="button" tabindex="0" @click="goTo('/saving')">
+            <div class="feature-left">
+              <div class="feature-icon">🎯</div>
+              <div>
+                <div class="feature-title">Savings</div>
+                <p class="feature-desc">Lege Sparziele an und verfolge deinen Fortschritt.</p>
               </div>
             </div>
             <span class="cta">Öffnen</span>
@@ -117,7 +117,6 @@ function goTo(route: string) {
     </section>
   </main>
 </template>
-
 
 <style scoped>
 *,

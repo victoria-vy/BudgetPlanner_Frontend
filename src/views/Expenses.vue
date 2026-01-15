@@ -9,7 +9,7 @@ const errorMsg = ref("");
 const title = ref("");
 const category = ref<ExpenseCategory>("FOOD");
 
-// ✅ Betrag als String für freie Eingabe + Placeholder
+//  Betrag als String für freie Eingabe + Placeholder
 const amountText = ref<string>("");
 
 // Presets fürs Dropdown (anpassen wie du willst)
@@ -47,7 +47,7 @@ async function load() {
   }
 }
 
-// ✅ Parse Betrag (akzeptiert auch Komma)
+// Parse Betrag (akzeptiert auch Komma)
 const amountNumber = computed(() => {
   const raw = amountText.value.trim().replace(",", ".");
   if (!raw) return 0;
@@ -133,7 +133,7 @@ async function remove(id?: number) {
       <div class="row">
         <input v-model="title" placeholder="Titel (z.B. Einkauf)" />
 
-        <!-- ✅ Betrag: editierbar + Dropdown Presets -->
+        <!-- Betrag: editierbar + Dropdown Presets -->
         <div class="dd">
           <div class="combo">
             <input
@@ -167,7 +167,7 @@ async function remove(id?: number) {
           </div>
         </div>
 
-        <!-- ✅ Kategorie Dropdown (wie Budget) -->
+        <!-- Kategorie Dropdown (wie Budget) -->
         <div class="dd">
           <button
             class="field dd-btn"
@@ -201,7 +201,7 @@ async function remove(id?: number) {
           <span class="icon">{{ iconForCategory(e.category) }}</span>
           <div>
             <div class="cat">{{ e.title }}</div>
-            <!-- ✅ Kategorie Deutsch -->
+            <!-- Kategorie Deutsch -->
             <small>
               {{ labelForCategory(e.category) }}
               <span v-if="e.date">• {{ e.date }}</span>
@@ -246,7 +246,7 @@ async function remove(id?: number) {
   align-items: center;
 }
 
-/* ✅ Einheitliche Höhe */
+/* Einheitliche Höhe */
 input {
   height: 52px;
   padding: 0.8rem;
@@ -296,7 +296,7 @@ input {
   opacity: 0.8;
 }
 
-/* ✅ Betrag Combo: Input + Pfeil */
+/* Betrag Combo: Input + Pfeil */
 .combo {
   height: 52px;
   display: grid;

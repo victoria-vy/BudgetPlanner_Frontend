@@ -7,10 +7,13 @@ const budgets = ref<Budget[]>([]);
 const errorMsg = ref("");
 
 const title = ref("");
-const month = ref("");
+
+//UI-Eingabe (Monat, Jahr), Speicherung bleibt YYYY-MM
+const monthText = ref("");
+
 const category = ref<BudgetCategory>("FOOD");
 
-// ✅ Limit: freie Eingabe + Dropdown Presets
+// Limit: freie Eingabe + Dropdown Presets
 const limitText = ref<string>("");
 const limitPresets = [10, 20, 50, 100, 200, 500, 1000];
 
@@ -45,7 +48,113 @@ async function load() {
   }
 }
 
-// ✅ Parse Limit (akzeptiert Komma)
+/* ---------------- Monat Parser (UI -> YYYY-MM) ---------------- */
+function normalizeMonthInputToYYYYMM(input: string): string {
+  const raw = (input ?? "").trim();
+  if (!raw) return "";
+
+  // 1) Wenn User schon YYYY-MM eingibt
+  const iso = raw.match(/^(\d{4})-(\d{1,2})$/);
+  if (iso) {
+    const y = iso[1];
+    const m = iso[2].padStart(2, "0");
+    return `${y}-${m}`;
+  }
+
+  // 2) Komma optional: "Januar, 2026" -> "Januar 2026"
+  const cleaned = raw.replace(",", " ").replace(/\s+/g, " ").trim();
+
+  // a) "01 2026" / "1 2026"
+  const numFirst = cleaned.match(/^(\d{1,2})\s+(\d{4})$/);
+  if (numFirst) {
+    const m = numFirst[1].padStart(2, "0");
+    const y = numFirst[2];
+    if (Number(m) >= 1 && Number(m) <= 12) return `${y}-${m}`;
+  }
+
+  // b) "2026 01" / "2026 1"
+  const yearFirst = cleaned.match(/^(\d{4})\s+(\d{1,2})$/);
+  if (yearFirst) {
+    const y = yearFirst[1];
+    const m = yearFirst[2].padStart(2, "0");
+    if (Number(m) >= 1 && Number(m) <= 12) return `${y}-${m}`;
+  }
+
+  // c) Monatsname (de)
+  const parts = cleaned.split(" ");
+  if (parts.length >= 2) {
+    const year = parts[parts.length - 1];
+    const monthNameRaw = parts.slice(0, parts.length - 1).join(" ").toLowerCase();
+    const monthName = monthNameRaw.replace(".", "");
+
+    const map: Record<string, string> = {
+      "januar": "01",
+      "jan": "01",
+      "februar": "02",
+      "feb": "02",
+      "märz": "03",
+      "maerz": "03",
+      "mär": "03",
+      "april": "04",
+      "apr": "04",
+      "mai": "05",
+      "juni": "06",
+      "jun": "06",
+      "juli": "07",
+      "jul": "07",
+      "august": "08",
+      "aug": "08",
+      "september": "09",
+      "sep": "09",
+      "sept": "09",
+      "oktober": "10",
+      "okt": "10",
+      "november": "11",
+      "nov": "11",
+      "dezember": "12",
+      "dez": "12",
+    };
+
+    if (/^\d{4}$/.test(year)) {
+      const mm = map[monthName];
+      if (mm) return `${year}-${mm}`;
+    }
+  }
+
+  return "";
+}
+
+function displayMonthYYYYMMToUser(yyyymm: string): string {
+  const m = (yyyymm ?? "").match(/^(\d{4})-(\d{2})$/);
+  if (!m) return yyyymm;
+  const y = m[1];
+  const mm = m[2];
+  const names: Record<string, string> = {
+    "01": "Januar",
+    "02": "Februar",
+    "03": "März",
+    "04": "April",
+    "05": "Mai",
+    "06": "Juni",
+    "07": "Juli",
+    "08": "August",
+    "09": "September",
+    "10": "Oktober",
+    "11": "November",
+    "12": "Dezember",
+  };
+  return `${names[mm] ?? mm} ${y}`;
+}
+
+const month = computed(() => normalizeMonthInputToYYYYMM(monthText.value));
+
+function normalizeMonthField() {
+  const yyyymm = month.value;
+  if (!yyyymm) return;
+  monthText.value = displayMonthYYYYMMToUser(yyyymm);
+}
+
+// Parse Limit (akzeptiert Komma)
 const limitNumber = computed(() => {
   const raw = limitText.value.trim().replace(",", ".");
   if (!raw) return 0;
@@ -71,15 +180,15 @@ async function addBudget() {
   try {
     const created = await createBudget({
       title: title.value,
-      month: month.value,
-      limitAmount: limitNumber.value,  // ✅ kommt aus Textfeld
+      month: month.value, // IMMER YYYY-MM in DB
+      limitAmount: limitNumber.value,
       category: category.value,
     });
 
     budgets.value.unshift(created);
 
     title.value = "";
-    month.value = "";
+    monthText.value = "";
     limitText.value = "";
     category.value = "FOOD";
     closeAll();
@@ -134,9 +243,15 @@ function displayTitle(b: Budget) {
 
       <div class="row">
         <input v-model="title" placeholder="Titel (z.B. Wocheneinkauf)" />
-        <input v-model="month" placeholder="Monat (YYYY-MM)" />
 
-        <!-- ✅ Limit: Combo (Eingabe + Dropdown) -->
+        <!-- Monat als "Monat, Jahr" (Komma egal), gespeichert als YYYY-MM -->
+        <input
+          v-model="monthText"
+          placeholder="Monat, Jahr (z.B. Januar 2026)"
+          @blur="normalizeMonthField"
+        />
+
+        <!-- Limit: Combo (Eingabe + Dropdown) -->
         <div class="dd">
           <div class="combo">
             <input
@@ -170,7 +285,7 @@ function displayTitle(b: Budget) {
           </div>
         </div>
 
-        <!-- ✅ Kategorie: Dropdown wie bisher -->
+        <!-- Kategorie: Dropdown wie bisher -->
         <div class="dd">
           <button
             class="field dd-btn"
@@ -207,7 +322,8 @@ function displayTitle(b: Budget) {
             <div class="cat">{{ displayTitle(b) }}</div>
 
             <small class="meta">
-              <span>{{ b.month }}</span>
+              <!-- Anzeige im UI: Monat Jahr -->
+              <span>{{ displayMonthYYYYMMToUser(b.month) }}</span>
               <span class="dot">•</span>
               <span class="small-cat">{{ labelForCategory(b.category) }}</span>
             </small>
@@ -229,7 +345,6 @@ function displayTitle(b: Budget) {
 .budgets {
   width: 900px;
   padding: 2rem;
-  font-family: "Apple Braille";
 }
 
 .error {
@@ -300,7 +415,7 @@ input {
   opacity: 0.8;
 }
 
-/* ✅ Limit Combo: Input + Pfeil */
+/* Limit Combo: Input + Pfeil */
 .combo {
   height: 52px;
   display: grid;

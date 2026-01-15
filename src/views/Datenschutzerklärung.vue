@@ -3,7 +3,7 @@
 <template>
   <main class="legal">
   <h1>Datenschutzerklärung</h1>
-  <p>Hier kommt deine Datenschutzerklärung rein.</p>
+  <p></p>
 </main>
 </template>
 

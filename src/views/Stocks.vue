@@ -165,6 +165,14 @@ function openFromPortfolio(s: Stock) {
   // Kurs lädt automatisch durch watch(symbol)
 }
 
+function formatDate(dateStr?: string): string {
+  if (!dateStr) return '—'
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('de-DE')
+}
+
+const todayFormatted = new Date().toLocaleDateString('de-DE')
+
 function perfForStock(s: Stock): { pct: number; text: string } | null {
   const q = portfolioQuotes.value?.[s.symbol?.toUpperCase()]
   if (!q?.c || !s.buyPrice || s.buyPrice <= 0) return null
@@ -173,6 +181,7 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
   const sign = pct >= 0 ? '+' : ''
   return { pct, text: `${sign}${pct.toFixed(2)}%` }
 }
+
 </script>
 
 <template>
@@ -268,9 +277,15 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
 
       <ul v-if="savedStocks.length">
         <li v-for="s in savedStocks" :key="s.id ?? s.symbol" class="stock-row">
-          <button class="pf-btn" @click="openFromPortfolio(s)" :title="s.name ?? s.symbol">
-            {{ s.name ? `${s.name} (${s.symbol})` : s.symbol }}
+          <button class="pf-btn" @click="openFromPortfolio(s)">
+            <span class="pf-title">
+              {{ s.name ? `${s.name} (${s.symbol})` : s.symbol }}
+            </span>
+            <span class="pf-dates">
+              · {{ formatDate(s.buyDate) }} → {{ todayFormatted }}
+            </span>
           </button>
+
 
           <span
             v-if="perfForStock(s)"
@@ -482,4 +497,29 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
 .perf.pos { color: #0a7a2f; }
 .perf.neg { color: #b00020; }
 .perf.neutral { color: #9ca3af; }
+
+.pf-btn {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  flex: 1;
+  text-align: left;
+
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.pf-title {
+  font-weight: 600;
+}
+
+.pf-dates {
+  font-size: 0.85rem;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
 </style>

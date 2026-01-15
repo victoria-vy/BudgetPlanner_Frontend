@@ -23,7 +23,6 @@
   align-items: center;
   max-width: 900px;
   margin: 2rem auto 0;
-  font-family: "Apple Braille";
 }
 
 .footer-menu {

@@ -9,7 +9,7 @@ const errorMsg = ref("");
 const title = ref("");
 const category = ref<IncomeCategory>("SALARY");
 
-// ✅ Betrag als Text für freie Eingabe + Placeholder
+// Betrag als Text für freie Eingabe + Placeholder
 const amountText = ref<string>("");
 
 // Presets fürs Dropdown (anpassbar)
@@ -48,7 +48,7 @@ async function load() {
   }
 }
 
-// ✅ Parse Betrag (akzeptiert Komma)
+// Parse Betrag (akzeptiert Komma)
 const amountNumber = computed(() => {
   const raw = amountText.value.trim().replace(",", ".");
   if (!raw) return 0;
@@ -127,7 +127,7 @@ async function remove(id?: number) {
       <div class="row">
         <input v-model="title" placeholder="Titel (z.B. Gehalt)" />
 
-        <!-- ✅ Betrag: editierbar + Dropdown Presets -->
+        <!-- Betrag: editierbar + Dropdown Presets -->
         <div class="dd">
           <div class="combo">
             <input
@@ -194,7 +194,7 @@ async function remove(id?: number) {
           <span class="icon">{{ iconForCategory(i.category) }}</span>
           <div>
             <div class="cat">{{ i.title }}</div>
-            <!-- ✅ Kategorie Deutsch -->
+            <!-- Kategorie Deutsch -->
             <small>
               {{ labelForCategory(i.category) }}
               <span v-if="i.date">• {{ i.date }}</span>
@@ -241,7 +241,7 @@ async function remove(id?: number) {
   align-items: center;
 }
 
-/* ✅ Einheitliche Höhe */
+/* Einheitliche Höhe */
 input {
   height: 52px;
   padding: 0.8rem;
@@ -291,7 +291,7 @@ input {
   opacity: 0.8;
 }
 
-/* ✅ Betrag Combo: Input + Pfeil */
+/* Betrag Combo: Input + Pfeil */
 .combo {
   height: 52px;
   display: grid;

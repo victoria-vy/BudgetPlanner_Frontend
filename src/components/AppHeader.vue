@@ -43,7 +43,6 @@ import account from '@/assets/Account.png'
 
   max-width: 1100px;
   margin: 0 auto;
-  font-family: "Apple Braille";
 }
 
 .header-menu a {
@@ -51,12 +50,6 @@ import account from '@/assets/Account.png'
   font-size: 1.2rem;
   text-decoration: none;
 }
-
-.router-link-active {
-  color: #356e33;
-  border-bottom: 2px solid #356e33;
-}
-
 /* Links */
 .header-left {
   justify-self: start;
@@ -86,7 +79,6 @@ import account from '@/assets/Account.png'
 .account-icon {
   width: 55px;
   height: 55px;
-  border-radius: 50%; /* optional, z.B. für Profilbild */
   cursor: pointer;
   transition: transform 0.15s ease, opacity 0.15s ease;
 }

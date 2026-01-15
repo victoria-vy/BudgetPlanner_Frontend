@@ -34,7 +34,7 @@ onMounted(() => {
 
 async function handleLogin() {
   try {
-    // ✅ Frontend Validation
+    // Frontend Validation
     if (!isValidEmail(loginEmail.value)) {
       alert("Bitte eine gültige E-Mail-Adresse eingeben.");
       return;
@@ -229,7 +229,6 @@ function handleLogout() {
 .account {
   width: 900px;
   padding: 2rem;
-  font-family: "Apple Braille";
 }
 
 .page-head {

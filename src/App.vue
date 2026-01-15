@@ -23,6 +23,16 @@ const showHeader = computed(() => !route.meta.hideHeader)
 </template>
 
 <style>
+
+
+:root {
+  font-family: Arial;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+}
+
 .app-layout {
   min-height: 100vh;
   display: flex;
