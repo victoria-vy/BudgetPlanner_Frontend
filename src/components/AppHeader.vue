@@ -9,12 +9,10 @@ import account from '@/assets/Account.png'
 
       <nav class="header-menu">
 
-        //Logo
         <div class="header-left">
           <img :src="logo" alt="Logo" class="logo" />
         </div>
 
-        //Menü
         <div class="header-center">
           <RouterLink to="/home">Home</RouterLink>
           <RouterLink to="/Budget">Budget</RouterLink>
@@ -25,7 +23,6 @@ import account from '@/assets/Account.png'
           <RouterLink to="/report">Report</RouterLink>
         </div>
 
-        //Account
         <div class="header-right">
           <RouterLink to="/account" class="account-link">
             <img :src="account" alt="Account" class="account-icon" />

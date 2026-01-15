@@ -136,7 +136,6 @@ function handleLogout() {
       <p class="sub">Login & Registrierung</p>
     </header>
 
-    //Dauerhafte Warnung
     <p v-if="showLoginHint" class="logged-in warning">
       Bitte logge dich ein, um die anderen Funktionen zu nutzen.
     </p>
@@ -147,7 +146,6 @@ function handleLogout() {
 
     <section class="grid">
 
-      //Login
       <div class="card">
         <h2>Log In</h2>
 
@@ -180,7 +178,6 @@ function handleLogout() {
         </div>
       </div>
 
-      //Signup
       <div class="card">
         <h2>Sign Up</h2>
 
