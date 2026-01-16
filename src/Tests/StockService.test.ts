@@ -29,8 +29,8 @@ describe('stockService', () => {
 
   it('lädt User Stocks', async () => {
     const mockStocks: Stock[] = [
-      { id: 1, symbol: 'AAPL', quantity: 10 },
-      { id: 2, symbol: 'TSLA', quantity: 5 }
+      { id: 1, symbol: 'AAPL', tvSymbol: 'NASDAQ:AAPL', quantity: 10 },
+      { id: 2, symbol: 'TSLA', tvSymbol: 'NASDAQ:TSLA', quantity: 5 }
     ]
 
     mockFetch.mockResolvedValueOnce({
@@ -47,7 +47,7 @@ describe('stockService', () => {
   })
 
   it('speichert einen Stock', async () => {
-    const stock: Stock = { id: 1, symbol: 'AAPL', quantity: 10 }
+    const stock: Stock = { id: 1, symbol: 'AAPL',tvSymbol: 'NASDAQ:AAPL', quantity: 10 }
 
     mockFetch.mockResolvedValueOnce({
       ok: true,

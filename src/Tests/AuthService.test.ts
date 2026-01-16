@@ -10,7 +10,7 @@ describe("authService", () => {
 
   beforeEach(() => {
 
-    localStorage.clear();
+    sessionStorage.clear();
   });
 
   it("speichert und liest ein Token korrekt", () => {
