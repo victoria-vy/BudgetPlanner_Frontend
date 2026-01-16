@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref, nextTick, computed } from "vue";
 import Chart from "chart.js/auto";
+import type { ActiveElement, ChartEvent } from "chart.js";
 import { getReport } from "@/service/reportService";
 import type { ReportResponse } from "@/models/Report";
 import { getUserStocks, getStockQuotes, type Quote } from "@/service/StockService";
@@ -24,6 +25,16 @@ function onDocClick(e: MouseEvent) {
   const t = e.target as HTMLElement | null;
   if (!t) return;
   if (!t.closest(".dd")) closeAll();
+}
+
+function getErrorMessage(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (typeof e === "object" && e !== null && "message" in e) {
+    const msg = (e as { message?: unknown }).message;
+    if (typeof msg === "string") return msg;
+  }
+  if (typeof e === "string") return e;
+  return "Fehler";
 }
 
 // --- Jahr/Monat Auswahl ---
@@ -73,8 +84,9 @@ function setMonth(m: string) {
 // --- Charts ---
 const barCanvas = ref<HTMLCanvasElement | null>(null);
 const pieCanvas = ref<HTMLCanvasElement | null>(null);
-let barChart: Chart | null = null;
-let pieChart: Chart | null = null;
+
+let barChart: Chart<"bar"> | null = null;
+let pieChart: Chart<"doughnut"> | null = null;
 
 // Klick-Info (zeigt Wert mit €)
 const barClickInfo = ref<string>("");
@@ -100,8 +112,8 @@ async function load() {
 
     await nextTick();
     renderCharts();
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? "Fehler";
+  } catch (e: unknown) {
+    errorMsg.value = getErrorMessage(e) ?? "Fehler";
   }
 }
 
@@ -118,6 +130,7 @@ function renderCharts() {
   // Bar chart
   if (barCanvas.value) {
     if (barChart) barChart.destroy();
+
     barChart = new Chart(barCanvas.value, {
       type: "bar",
       data: {
@@ -151,15 +164,25 @@ function renderCharts() {
           tooltip: {
             callbacks: {
               label: (ctx) => {
-                const v = Number(ctx.parsed.y ?? ctx.parsed);
+                const parsed = ctx.parsed as unknown;
+                const v =
+                  typeof parsed === "object" &&
+                  parsed !== null &&
+                  "y" in (parsed as Record<string, unknown>)
+                    ? Number((parsed as { y?: unknown }).y)
+                    : Number(parsed);
+
                 return `${ctx.dataset.label}: ${euro(Number.isFinite(v) ? v : 0)}`;
               },
             },
           },
         },
-        onClick: (_evt, elements) => {
-          if (!elements?.length) return;
+        onClick: (_evt: ChartEvent, elements: ActiveElement[]) => {
+          if (!elements.length) return;
+
           const el = elements[0];
+          if (!el) return; // <- Fix: el kann laut TS undefined sein
+
           const i = el.index;
           const ds = el.datasetIndex;
 
@@ -180,6 +203,7 @@ function renderCharts() {
     const pieData = spentRows.map((r) => r.spent);
 
     if (pieChart) pieChart.destroy();
+
     pieChart = new Chart(pieCanvas.value, {
       type: "doughnut",
       data: {
@@ -189,8 +213,6 @@ function renderCharts() {
             label: "Ausgaben",
             data: pieData,
             borderWidth: 2,
-            radius: "90%",
-            cutout: "60%",
             backgroundColor: pieData.map((_, i) => (i % 2 === 0 ? "#90dcea" : "#162865")),
             borderColor: "#ffffff",
           },
@@ -202,6 +224,9 @@ function renderCharts() {
         layout: {
           padding: { top: 8, right: 10, bottom: 22, left: 10 },
         },
+        // ✅ Fix: radius/cutout gehören bei dir als Typ offenbar in options, nicht ins Dataset
+        radius: "90%",
+        cutout: "60%",
         plugins: {
           legend: {
             position: "bottom",
@@ -216,9 +241,12 @@ function renderCharts() {
             },
           },
         },
-        onClick: (_evt, elements) => {
-          if (!elements?.length) return;
+        onClick: (_evt: ChartEvent, elements: ActiveElement[]) => {
+          if (!elements.length) return;
+
           const el = elements[0];
+          if (!el) return; // <- Fix: el kann laut TS undefined sein
+
           const i = el.index;
 
           const cat = pieLabels[i];
@@ -486,6 +514,7 @@ const savingsPct = computed(() => {
 </template>
 
 <style scoped>
+/* (dein CSS unverändert) */
 .report {
   width: 900px;
   padding: 2rem;

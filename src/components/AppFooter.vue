@@ -4,7 +4,6 @@
 <template>
   <footer class="footer">
 
-    //Footer für die Website
     <nav class="footer-menu">
       <p class="copyright">© 2025 MoneyManager</p>
       <RouterLink to="/impressum">Impressum</RouterLink>
