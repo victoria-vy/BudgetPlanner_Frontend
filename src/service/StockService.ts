@@ -37,44 +37,51 @@ export async function clearPortfolio(): Promise<void> {
   if (!response.ok) throw new Error('Portfolio konnte nicht zurückgesetzt werden')
 }
 
-export async function searchStockSymbols(keywords: string): Promise<any> {
-  const q = keywords.trim()
-  if (!q) return { s: 'ok', matches: [] }
-
-  const response = await fetch(`${baseUrl}/api/stocks/search/${encodeURIComponent(q)}`, {
-    headers: { ...authHeader() }
-  })
-
-  const data = await safeJson(response)
-  if (!response.ok) throw new Error(data?.message ?? 'Suche konnte nicht geladen werden')
-  return data
-}
-
 export async function getStockQuote(symbol: string): Promise<Quote> {
   const response = await fetch(`${baseUrl}/api/stocks/quote/${encodeURIComponent(symbol)}`, {
     headers: { ...authHeader() }
-  })
+  });
 
-  const data = await safeJson(response)
-  if (!response.ok) throw new Error(data?.message ?? 'Kursdaten konnten nicht geladen werden')
-  return data
+  const data = await safeJson<Quote>(response);
+  if (!response.ok) throw new Error((data as { message?: string })?.message ?? 'Kursdaten konnten nicht geladen werden');
+
+  return data as Quote;
 }
 
-export async function getStockQuotes(symbols: string[]): Promise<any> {
-  const csv = symbols.map(s => s.trim().toUpperCase()).filter(Boolean).join(',')
-  if (!csv) return { s: 'ok', data: {} }
+export type QuotesResponse = {
+  s: 'ok' | 'error';
+  data: Record<string, Quote>;
+  message?: string;
+};
+
+export async function getStockQuotes(symbols: string[]): Promise<QuotesResponse> {
+  const csv = symbols.map(s => s.trim().toUpperCase()).filter(Boolean).join(',');
+  if (!csv) return { s: 'ok', data: {} };
 
   const response = await fetch(`${baseUrl}/api/stocks/quotes?symbols=${encodeURIComponent(csv)}`, {
     headers: { ...authHeader() }
-  })
+  });
 
-  const data = await safeJson(response)
-  if (!response.ok) throw new Error(data?.message ?? 'Kursdaten konnten nicht geladen werden')
-  return data
+  const data = await safeJson<QuotesResponse>(response);
+
+  if (!response.ok) {
+    const msg = (data as { message?: string })?.message ?? 'Kursdaten konnten nicht geladen werden';
+    throw new Error(msg);
+  }
+
+  return data as QuotesResponse;
 }
 
-async function safeJson(response: Response): Promise<any> {
-  const txt = await response.text()
-  if (!txt) return null
-  try { return JSON.parse(txt) } catch { return { message: txt } }
+type ErrorMessage = { message?: string };
+
+async function safeJson<T>(response: Response): Promise<T | ErrorMessage | null> {
+  const txt = await response.text();
+  if (!txt) return null;
+
+  try {
+    return JSON.parse(txt) as T;
+  } catch {
+    return { message: txt };
+  }
 }
+

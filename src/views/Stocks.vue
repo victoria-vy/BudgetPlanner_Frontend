@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import TradingViewChart from '@/components/TradingViewChart.vue'
-import { mapToTradingViewSymbol } from '@/service/tradingViewSymbol'
+import { mapToTradingViewSymbol } from '@/service/TradingViewSymbol'
 
 import {
   getUserStocks,
