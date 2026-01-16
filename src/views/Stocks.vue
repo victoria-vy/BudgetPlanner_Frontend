@@ -45,6 +45,16 @@ function pickExample(sym: string) {
   symbol.value = sym
 }
 
+function getErrorMessage(e: unknown): string {
+  if (e instanceof Error) return e.message
+  if (typeof e === 'object' && e !== null && 'message' in e) {
+    const msg = (e as { message?: unknown }).message
+    if (typeof msg === 'string') return msg
+  }
+  if (typeof e === 'string') return e
+  return 'Fehler'
+}
+
 onMounted(async () => {
   if (!isLoggedIn()) {
     errorMsg.value = 'Bitte zuerst im Account einloggen.'
@@ -68,8 +78,8 @@ async function reloadPortfolio() {
   try {
     savedStocks.value = await getUserStocks()
     await reloadPortfolioQuotes()
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? 'Fehler beim Laden'
+  } catch (e: unknown) {
+    errorMsg.value = getErrorMessage(e) || 'Fehler beim Laden'
   }
 }
 
@@ -98,9 +108,9 @@ async function loadStockData() {
       return
     }
     quote.value = q
-  } catch (e: any) {
+  } catch (e: unknown) {
     quote.value = null
-    errorMsg.value = e?.message ?? 'Fehler beim Laden der Kursdaten'
+    errorMsg.value = getErrorMessage(e) || 'Fehler beim Laden der Kursdaten'
   }
 }
 
@@ -128,8 +138,8 @@ async function saveStock() {
     const saved = await addStock(stock)
     savedStocks.value.push(saved)
     await reloadPortfolioQuotes()
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? 'Fehler beim Speichern'
+  } catch (e: unknown) {
+    errorMsg.value = getErrorMessage(e) || 'Fehler beim Speichern'
   }
 }
 
@@ -143,8 +153,8 @@ async function removeStock(stock: Stock) {
     await deleteStock(stock.id)
     savedStocks.value = savedStocks.value.filter(s => s.id !== stock.id)
     await reloadPortfolioQuotes()
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? 'Fehler beim Löschen'
+  } catch (e: unknown) {
+    errorMsg.value = getErrorMessage(e) || 'Fehler beim Löschen'
   }
 }
 
@@ -154,8 +164,8 @@ async function resetPortfolio() {
     await clearPortfolio()
     savedStocks.value = []
     portfolioQuotes.value = {}
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? 'Fehler beim Zurücksetzen'
+  } catch (e: unknown) {
+    errorMsg.value = getErrorMessage(e) || 'Fehler beim Zurücksetzen'
   }
 }
 
@@ -181,7 +191,6 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
   const sign = pct >= 0 ? '+' : ''
   return { pct, text: `${sign}${pct.toFixed(2)}%` }
 }
-
 </script>
 
 <template>
@@ -225,7 +234,6 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
           Speichern (Portfolio)
         </button>
       </div>
-
 
       <!-- Quote Tabelle -->
       <div v-if="quote" class="quote-table">
@@ -285,7 +293,6 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
               · {{ formatDate(s.buyDate) }} → {{ todayFormatted }}
             </span>
           </button>
-
 
           <span
             v-if="perfForStock(s)"
@@ -521,5 +528,4 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
   color: #6b7280;
   white-space: nowrap;
 }
-
 </style>
