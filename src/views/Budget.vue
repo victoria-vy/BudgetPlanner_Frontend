@@ -31,6 +31,16 @@ function onDocClick(e: MouseEvent) {
   if (!t.closest(".dd")) closeAll();
 }
 
+function getErrorMessage(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (typeof e === "object" && e !== null && "message" in e) {
+    const msg = (e as { message?: unknown }).message;
+    if (typeof msg === "string") return msg;
+  }
+  if (typeof e === "string") return e;
+  return "Fehler";
+}
+
 onMounted(() => {
   load();
   document.addEventListener("click", onDocClick);
@@ -43,107 +53,121 @@ async function load() {
   errorMsg.value = "";
   try {
     budgets.value = await getBudgets();
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? "Fehler beim Laden";
+  } catch (e: unknown) {
+    errorMsg.value = getErrorMessage(e) ?? "Fehler beim Laden";
   }
 }
 
 /* ---------------- Monat Parser (UI -> YYYY-MM) ---------------- */
+
+const monthNameToMM: Record<string, string> = {
+  januar: "01",
+  jan: "01",
+  februar: "02",
+  feb: "02",
+  märz: "03",
+  maerz: "03",
+  mär: "03",
+  april: "04",
+  apr: "04",
+  mai: "05",
+  juni: "06",
+  jun: "06",
+  juli: "07",
+  jul: "07",
+  august: "08",
+  aug: "08",
+  september: "09",
+  sep: "09",
+  sept: "09",
+  oktober: "10",
+  okt: "10",
+  november: "11",
+  nov: "11",
+  dezember: "12",
+  dez: "12",
+};
+
+const mmToMonthName: Record<string, string> = {
+  "01": "Januar",
+  "02": "Februar",
+  "03": "März",
+  "04": "April",
+  "05": "Mai",
+  "06": "Juni",
+  "07": "Juli",
+  "08": "August",
+  "09": "September",
+  "10": "Oktober",
+  "11": "November",
+  "12": "Dezember",
+};
+
 function normalizeMonthInputToYYYYMM(input: string): string {
-  const raw = (input ?? "").trim();
+  const raw = input.trim();
   if (!raw) return "";
 
   // 1) Wenn User schon YYYY-MM eingibt
   const iso = raw.match(/^(\d{4})-(\d{1,2})$/);
   if (iso) {
-    const y = iso[1];
-    const m = iso[2].padStart(2, "0");
-    return `${y}-${m}`;
+    const [, y, mRaw] = iso;
+    if (!y || !mRaw) return "";
+
+    const m = mRaw.padStart(2, "0");
+    const mi = Number(m);
+    if (mi >= 1 && mi <= 12) return `${y}-${m}`;
+    return "";
   }
 
   // 2) Komma optional: "Januar, 2026" -> "Januar 2026"
-  const cleaned = raw.replace(",", " ").replace(/\s+/g, " ").trim();
+  const cleaned = raw.replace(/,/g, " ").replace(/\s+/g, " ").trim();
 
   // a) "01 2026" / "1 2026"
   const numFirst = cleaned.match(/^(\d{1,2})\s+(\d{4})$/);
   if (numFirst) {
-    const m = numFirst[1].padStart(2, "0");
-    const y = numFirst[2];
-    if (Number(m) >= 1 && Number(m) <= 12) return `${y}-${m}`;
+    const [, mRaw, y] = numFirst;
+    if (!mRaw || !y) return "";
+
+    const m = mRaw.padStart(2, "0");
+    const mi = Number(m);
+    if (mi >= 1 && mi <= 12) return `${y}-${m}`;
   }
 
   // b) "2026 01" / "2026 1"
   const yearFirst = cleaned.match(/^(\d{4})\s+(\d{1,2})$/);
   if (yearFirst) {
-    const y = yearFirst[1];
-    const m = yearFirst[2].padStart(2, "0");
-    if (Number(m) >= 1 && Number(m) <= 12) return `${y}-${m}`;
+    const [, y, mRaw] = yearFirst;
+    if (!mRaw || !y) return "";
+
+    const m = mRaw.padStart(2, "0");
+    const mi = Number(m);
+    if (mi >= 1 && mi <= 12) return `${y}-${m}`;
   }
 
-  // c) Monatsname (de)
-  const parts = cleaned.split(" ");
+  // c) Monatsname (de), z.B. "Januar 2026"
+  const parts = cleaned.split(" ").filter(Boolean);
   if (parts.length >= 2) {
     const year = parts[parts.length - 1];
+    if (!year || !/^\d{4}$/.test(year)) return "";
+
     const monthNameRaw = parts.slice(0, parts.length - 1).join(" ").toLowerCase();
-    const monthName = monthNameRaw.replace(".", "");
+    const monthName = monthNameRaw.replace(/\./g, "");
 
-    const map: Record<string, string> = {
-      "januar": "01",
-      "jan": "01",
-      "februar": "02",
-      "feb": "02",
-      "märz": "03",
-      "maerz": "03",
-      "mär": "03",
-      "april": "04",
-      "apr": "04",
-      "mai": "05",
-      "juni": "06",
-      "jun": "06",
-      "juli": "07",
-      "jul": "07",
-      "august": "08",
-      "aug": "08",
-      "september": "09",
-      "sep": "09",
-      "sept": "09",
-      "oktober": "10",
-      "okt": "10",
-      "november": "11",
-      "nov": "11",
-      "dezember": "12",
-      "dez": "12",
-    };
-
-    if (/^\d{4}$/.test(year)) {
-      const mm = map[monthName];
-      if (mm) return `${year}-${mm}`;
-    }
+    const mm = monthNameToMM[monthName];
+    if (mm) return `${year}-${mm}`;
   }
 
   return "";
 }
 
 function displayMonthYYYYMMToUser(yyyymm: string): string {
-  const m = (yyyymm ?? "").match(/^(\d{4})-(\d{2})$/);
+  const m = yyyymm.match(/^(\d{4})-(\d{2})$/);
   if (!m) return yyyymm;
-  const y = m[1];
-  const mm = m[2];
-  const names: Record<string, string> = {
-    "01": "Januar",
-    "02": "Februar",
-    "03": "März",
-    "04": "April",
-    "05": "Mai",
-    "06": "Juni",
-    "07": "Juli",
-    "08": "August",
-    "09": "September",
-    "10": "Oktober",
-    "11": "November",
-    "12": "Dezember",
-  };
-  return `${names[mm] ?? mm} ${y}`;
+
+  const [, y, mm] = m;
+  if (!y || !mm) return yyyymm;
+
+  return `${mmToMonthName[mm] ?? mm} ${y}`;
 }
 
 const month = computed(() => normalizeMonthInputToYYYYMM(monthText.value));
@@ -192,8 +216,8 @@ async function addBudget() {
     limitText.value = "";
     category.value = "FOOD";
     closeAll();
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? "Fehler beim Anlegen";
+  } catch (e: unknown) {
+    errorMsg.value = getErrorMessage(e) ?? "Fehler beim Anlegen";
   }
 }
 

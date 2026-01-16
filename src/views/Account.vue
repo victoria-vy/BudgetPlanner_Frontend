@@ -24,9 +24,23 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
+function getErrorMessage(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (typeof e === "object" && e !== null && "message" in e) {
+    const msg = (e as { message?: unknown }).message;
+    if (typeof msg === "string") return msg;
+  }
+  if (typeof e === "string") return e;
+  return "Fehler";
+}
+
+type RegisterErrorBody =
+  | { message?: string; error?: string; details?: string }
+  | string
+  | null;
+
 onMounted(() => {
   if (isLoggedIn()) router.replace("/Profile");
-
 });
 
 async function handleLogin() {
@@ -56,13 +70,24 @@ async function handleLogin() {
       return;
     }
 
-    const data = await res.json();
-    setToken(data.token);
+    const data: unknown = await res.json();
+
+    const token =
+      typeof data === "object" && data !== null && "token" in data
+        ? (data as { token?: unknown }).token
+        : undefined;
+
+    if (typeof token !== "string" || !token) {
+      alert("Login fehlgeschlagen: Ungültige Server-Antwort (token fehlt)");
+      return;
+    }
+
+    setToken(token);
     alert("Login erfolgreich");
     await router.push("/Profile");
-  } catch (e) {
+  } catch (e: unknown) {
     console.error(e);
-    alert("Login fehlgeschlagen");
+    alert(`Login fehlgeschlagen: ${getErrorMessage(e)}`);
   }
 }
 
@@ -93,19 +118,25 @@ async function handleSignup() {
     });
 
     const contentType = res.headers.get("content-type") || "";
-    let body: any = null;
+    let body: RegisterErrorBody = null;
 
     if (contentType.includes("application/json")) {
-      body = await res.json().catch(() => null);
+      body = (await res.json().catch(() => null)) as RegisterErrorBody;
     } else {
       body = await res.text().catch(() => "");
     }
 
     if (!res.ok) {
       const msg =
-        (body && body.message) ||
-        (body && body.error) ||
-        (body && body.details) ||
+        (typeof body === "object" && body !== null && "message" in body && typeof body.message === "string"
+          ? body.message
+          : "") ||
+        (typeof body === "object" && body !== null && "error" in body && typeof body.error === "string"
+          ? body.error
+          : "") ||
+        (typeof body === "object" && body !== null && "details" in body && typeof body.details === "string"
+          ? body.details
+          : "") ||
         (typeof body === "string" ? body : "") ||
         "Unbekannter Fehler";
 
@@ -117,9 +148,9 @@ async function handleSignup() {
 
     loginEmail.value = signupEmail.value.trim();
     loginPassword.value = signupPassword.value;
-  } catch (e) {
+  } catch (e: unknown) {
     console.error("REGISTER ERROR", e);
-    alert("Registrierung fehlgeschlagen (Netzwerk/CORS/Server nicht erreichbar)");
+    alert(`Registrierung fehlgeschlagen (Netzwerk/CORS/Server nicht erreichbar): ${getErrorMessage(e)}`);
   }
 }
 
@@ -145,7 +176,6 @@ function handleLogout() {
     </p>
 
     <section class="grid">
-
       <div class="card">
         <h2>Log In</h2>
 

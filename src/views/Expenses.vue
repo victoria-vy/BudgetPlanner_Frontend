@@ -30,6 +30,16 @@ function onDocClick(e: MouseEvent) {
   if (!t.closest(".dd")) closeAll();
 }
 
+function getErrorMessage(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (typeof e === "object" && e !== null && "message" in e) {
+    const msg = (e as { message?: unknown }).message;
+    if (typeof msg === "string") return msg;
+  }
+  if (typeof e === "string") return e;
+  return "Fehler";
+}
+
 onMounted(() => {
   load();
   document.addEventListener("click", onDocClick);
@@ -42,8 +52,8 @@ async function load() {
   errorMsg.value = "";
   try {
     items.value = await getExpenses();
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? "Fehler";
+  } catch (e: unknown) {
+    errorMsg.value = getErrorMessage(e) ?? "Fehler";
   }
 }
 
@@ -109,8 +119,8 @@ async function add() {
     amountText.value = "";
     category.value = "FOOD";
     closeAll();
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? "Fehler beim Speichern";
+  } catch (e: unknown) {
+    errorMsg.value = getErrorMessage(e) ?? "Fehler beim Speichern";
   }
 }
 

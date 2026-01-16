@@ -8,7 +8,6 @@
 </template>
 
 <style scoped>
-<style scoped>
 .legal {
   padding: 2rem;
 }
