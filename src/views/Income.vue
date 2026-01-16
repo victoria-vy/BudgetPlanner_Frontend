@@ -182,7 +182,7 @@ async function remove(id?: number) {
           </div>
         </div>
 
-        <button @click="add" :disabled="!canCreate" data-testid="add-income">
+        <button class="add" @click="add" :disabled="!canCreate" data-testid="add-income">
           Anlegen
         </button>
       </div>
@@ -204,7 +204,7 @@ async function remove(id?: number) {
 
         <div class="right">
           <strong class="plus">+ {{ i.amount }} €</strong>
-          <button class="danger" @click="remove(i.id)" data-testid="delete-income">
+          <button class="delete" @click="remove(i.id)" data-testid="delete-income">
             Löschen
           </button>
         </div>
@@ -334,6 +334,7 @@ input {
   border-radius: 12px;
   overflow: hidden;
   z-index: 50;
+  height: 52px;
 }
 
 .dd-item {
@@ -402,8 +403,24 @@ button {
   color: #15803d;
 }
 
-.danger {
+.delete {
   background: #ffe3e3;
+  color: #000000;
+}
+
+.delete:hover {
+  background-color: #ffe3e3;
+  color: white;
+}
+
+.add {
+  color: #000000;
+  background-color: #b4dda5;
+}
+
+.add:hover {
+  color: white;
+  background-color: #a7dd91;
 }
 
 .empty {

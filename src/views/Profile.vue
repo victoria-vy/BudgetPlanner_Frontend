@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { authHeader, clearToken, setToken } from "@/service/authService";
 import { useRouter } from "vue-router";
 
@@ -14,6 +14,39 @@ const currentPassword = ref(""); // optionaler Sicherheits-Check (Backend prüft
 
 const loading = ref(false);
 
+// einfache E-Mail-Validierung
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+function getErrorMessage(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (typeof e === "object" && e !== null && "message" in e) {
+    const msg = (e as { message?: unknown }).message;
+    if (typeof msg === "string") return msg;
+  }
+  if (typeof e === "string") return e;
+  return "Fehler";
+}
+
+// Typen für Responses
+type UpdateEmailResponse = { token: string; email: string; message?: string; error?: string } | string | null;
+
+// UI-Status
+const trimmedNewEmail = computed(() => newEmail.value.trim());
+const emailIsValid = computed(() => isValidEmail(trimmedNewEmail.value));
+const showEmailInvalidHint = computed(() => trimmedNewEmail.value.length > 0 && !emailIsValid.value);
+
+const saveDisabled = computed(() => {
+  return (
+    loading.value ||
+    !emailIsValid.value ||
+    !currentPassword.value.trim() ||
+    trimmedNewEmail.value.length === 0 ||
+    trimmedNewEmail.value === currentEmail.value // optional: nichts geändert
+  );
+});
+
 async function loadMe() {
   const res = await fetch(`${baseUrl}/api/auth/me`, {
     method: "GET",
@@ -26,13 +59,39 @@ async function loadMe() {
     return;
   }
 
-  const data = await res.json();
-  currentName.value = data.name;
-  currentEmail.value = data.email;
-  newEmail.value = data.email;
+  const data: unknown = await res.json();
+
+  const name =
+    typeof data === "object" && data !== null && "name" in data ? (data as { name?: unknown }).name : undefined;
+  const email =
+    typeof data === "object" && data !== null && "email" in data ? (data as { email?: unknown }).email : undefined;
+
+  if (typeof name !== "string" || typeof email !== "string") {
+    clearToken();
+    await router.push("/account");
+    return;
+  }
+
+  currentName.value = name;
+  currentEmail.value = email;
+  newEmail.value = email;
 }
 
 async function updateEmail() {
+  // Frontend-Validierung
+  if (!emailIsValid.value) {
+    alert("Bitte eine gültige E-Mail-Adresse eingeben.");
+    return;
+  }
+  if (!currentPassword.value.trim()) {
+    alert("Bitte aktuelles Passwort eingeben.");
+    return;
+  }
+  if (trimmedNewEmail.value === currentEmail.value) {
+    alert("Die neue E-Mail ist identisch mit der aktuellen.");
+    return;
+  }
+
   loading.value = true;
   try {
     const res = await fetch(`${baseUrl}/api/auth/me/email`, {
@@ -42,34 +101,58 @@ async function updateEmail() {
         ...authHeader(),
       },
       body: JSON.stringify({
-        newEmail: newEmail.value,
+        newEmail: trimmedNewEmail.value,
         currentPassword: currentPassword.value,
       }),
     });
 
     const contentType = res.headers.get("content-type") || "";
-    const body = contentType.includes("application/json")
-      ? await res.json().catch(() => null)
-      : await res.text().catch(() => "");
+    let body: UpdateEmailResponse = null;
+
+    if (contentType.includes("application/json")) {
+      body = (await res.json().catch(() => null)) as UpdateEmailResponse;
+    } else {
+      body = await res.text().catch(() => "");
+    }
 
     if (!res.ok) {
       const msg =
-        (body && body.message) ||
-        (body && body.error) ||
+        (typeof body === "object" && body !== null && "message" in body && typeof body.message === "string"
+          ? body.message
+          : "") ||
+        (typeof body === "object" && body !== null && "error" in body && typeof body.error === "string"
+          ? body.error
+          : "") ||
         (typeof body === "string" ? body : "") ||
         "Unbekannter Fehler";
+
       alert(`E-Mail ändern fehlgeschlagen (${res.status}): ${msg}`);
       return;
     }
 
     // Backend gibt neuen Token zurück (weil subject=email geändert wurde)
-    setToken(body.token);
-    currentEmail.value = body.email;
+    if (typeof body !== "object" || body === null) {
+      alert("E-Mail ändern fehlgeschlagen: Ungültige Server-Antwort");
+      return;
+    }
+
+    const token = "token" in body ? (body as { token?: unknown }).token : undefined;
+    const email = "email" in body ? (body as { email?: unknown }).email : undefined;
+
+    if (typeof token !== "string" || typeof email !== "string") {
+      alert("E-Mail ändern fehlgeschlagen: Ungültige Server-Antwort (token/email fehlt)");
+      return;
+    }
+
+    setToken(token);
+    currentEmail.value = email;
+    newEmail.value = email;
+
     alert("E-Mail erfolgreich geändert");
     currentPassword.value = "";
-  } catch (e) {
+  } catch (e: unknown) {
     console.error(e);
-    alert("Netzwerkfehler beim Speichern");
+    alert(`Netzwerkfehler beim Speichern: ${getErrorMessage(e)}`);
   } finally {
     loading.value = false;
   }
@@ -79,6 +162,7 @@ function logout() {
   clearToken();
   router.push("/account");
 }
+
 onMounted(loadMe);
 </script>
 
@@ -93,15 +177,19 @@ onMounted(loadMe);
       <div class="card">
         <h2>Dein Profil</h2>
 
-        <p class="hint">Name</p>
+        <p class="label">Name</p>
         <input class="input" :value="currentName" disabled />
 
-        <p class="hint">Aktuelle E-Mail</p>
+        <p class="label">Aktuelle E-Mail</p>
         <input class="input" :value="currentEmail" disabled />
 
-        <div class="actions">
-          <button class="btn ghost" @click="logout">Logout</button>
+        <div>
+          <button class="btn logout" @click="logout">Logout</button>
         </div>
+
+        <p class="hint">
+          Hinweis: Wenn du dich ausloggst, kannst du die Funktionen nicht mehr nutzen.
+        </p>
       </div>
 
       <div class="card">
@@ -115,6 +203,11 @@ onMounted(loadMe);
           v-model="newEmail"
         />
 
+        <!-- Meldung wenn ungültig -->
+        <p v-if="showEmailInvalidHint" class="validation">
+          Bitte gib eine gültige E-Mail-Adresse ein.
+        </p>
+
         <label class="label">Aktuelles Passwort</label>
         <input
           class="input"
@@ -123,9 +216,11 @@ onMounted(loadMe);
           v-model="currentPassword"
         />
 
-        <button class="btn primary" :disabled="loading" @click="updateEmail">
-          {{ loading ? "Speichern..." : "Speichern" }}
-        </button>
+        <div>
+          <button class="btn primary" @click="updateEmail" :disabled="saveDisabled">
+            {{ loading ? "Speichern..." : "Speichern" }}
+          </button>
+        </div>
 
         <p class="hint">
           Hinweis: Nach E-Mail-Änderung bekommst du automatisch einen neuen Token.
@@ -197,19 +292,28 @@ onMounted(loadMe);
   border-color: #9cc8ff;
 }
 
-.actions {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 1rem;
-  align-items: center;
-}
-
 .btn {
   border: none;
   border-radius: 12px;
   padding: 0.85rem 1rem;
   cursor: pointer;
   font-size: 1.05rem;
+  width: 100%;
+
+  min-height: 47px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout {
+  background: #ffd2d2;
+  color: #000;
+}
+
+.logout:hover {
+  background: #ffd2d2;
+  color: white;
 }
 
 .primary {
@@ -218,21 +322,24 @@ onMounted(loadMe);
 }
 
 .primary:hover {
-  background: #5c9644;
+  background: #a7dd91;
   color: white;
 }
 
-.ghost {
-  background: #f1f1f1;
-}
-
-.ghost:hover {
-  background: #e6e6e6;
-}
-
 .hint {
-  margin-top: 0.75rem;
+  margin-top: 0rem;
   color: #6b7280;
+  font-size: 0.95rem;
+}
+
+/* Validierungs-Meldung */
+.validation {
+  margin: 0.25rem 0 0.5rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #fed7aa;
+  background: #fff7ed;
+  color: #9a3412;
   font-size: 0.95rem;
 }
 

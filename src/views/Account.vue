@@ -144,10 +144,7 @@ async function handleSignup() {
       return;
     }
 
-    alert("Registrierung erfolgreich");
 
-    loginEmail.value = signupEmail.value.trim();
-    loginPassword.value = signupPassword.value;
   } catch (e: unknown) {
     console.error("REGISTER ERROR", e);
     alert(`Registrierung fehlgeschlagen (Netzwerk/CORS/Server nicht erreichbar): ${getErrorMessage(e)}`);
@@ -156,7 +153,6 @@ async function handleSignup() {
 
 function handleLogout() {
   clearToken();
-  alert("Logout erfolgreich");
 }
 </script>
 
@@ -197,7 +193,7 @@ function handleLogout() {
           data-testid="login-password"
         />
 
-        <div class="actions">
+
           <button class="btn primary" data-testid="login-button" @click="handleLogin">
             Log In
           </button>
@@ -205,7 +201,10 @@ function handleLogout() {
           <button v-if="loggedIn" class="btn ghost" @click="handleLogout">
             Logout
           </button>
-        </div>
+
+          <p class="hint">
+            Info: Nachdem du dich erfolgreich eingeloggt hast, kannst du in den Profileinstellungen deine E-Mail ändern.
+          </p>
       </div>
 
       <div class="card">
@@ -243,7 +242,7 @@ function handleLogout() {
         </button>
 
         <p class="hint">
-          Tipp: Wenn die Registrierung klappt, kannst du dich direkt mit denselben Daten einloggen.
+          Info: Wenn die Registrierung klappt, kannst du dich direkt mit denselben Daten einloggen.
         </p>
       </div>
     </section>
@@ -347,7 +346,7 @@ function handleLogout() {
 }
 
 .primary:hover {
-  background: #5c9644;
+  background: #a7dd91;
   color: white;
 }
 

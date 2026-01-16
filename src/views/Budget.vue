@@ -333,7 +333,7 @@ function displayTitle(b: Budget) {
           </div>
         </div>
 
-        <button @click="addBudget" :disabled="!canCreate">Anlegen</button>
+        <button class="add" @click="addBudget" :disabled="!canCreate">Anlegen</button>
       </div>
     </section>
 
@@ -560,8 +560,23 @@ button {
   gap: 1rem;
 }
 
+.add {
+  background-color: #b4dda5;
+  color: #000;
+}
+
+.add:hover{
+  background-color: #a7dd91;
+  color: white;
+}
+
 .danger {
-  background: #ffe3e3;
+  background: #ffd2d2;
+}
+
+.danger:hover {
+  color: white;
+  background-color: #ffd2d2;
 }
 
 .empty {

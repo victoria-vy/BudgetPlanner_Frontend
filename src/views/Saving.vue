@@ -295,7 +295,7 @@ async function remove(goal: SavingsGoal) {
           </div>
         </div>
 
-        <button @click="addGoal" :disabled="!canCreate">Anlegen</button>
+        <button class="add" @click="addGoal" :disabled="!canCreate">Anlegen</button>
       </div>
     </section>
 
@@ -323,11 +323,11 @@ async function remove(goal: SavingsGoal) {
 
         <div class="actions">
           <div class="actions-left">
-            <button @click="addAmount(g, 10)">+10€</button>
-            <button @click="addAmount(g, 50)">+50€</button>
+            <button class="add" @click="addAmount(g, 10)">+10€</button>
+            <button class="add" @click="addAmount(g, 50)">+50€</button>
           </div>
 
-          <button class="danger" @click="remove(g)">Löschen</button>
+          <button class="delete" @click="remove(g)">Löschen</button>
         </div>
 
       </article>
@@ -574,9 +574,25 @@ button {
   justify-content: flex-start; /* ganz links */
 }
 
-.danger {
-  justify-self: end; /* ganz rechts */
+.delete {
+  background: #ffe3e3;
+  color: #000000;
+  justify-self: end;
+}
+
+.delete:hover {
   background-color: #ffe3e3;
+  color: white;
+}
+
+.add {
+  color: #000000;
+  background-color: #b4dda5;
+}
+
+.add:hover {
+  color: white;
+  background-color: #a7dd91;
 }
 
 .empty {

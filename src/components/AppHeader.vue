@@ -5,85 +5,105 @@ import account from '@/assets/Account.png'
 
 <template>
   <header class="header">
+    <nav class="header-menu">
 
-
-      <nav class="header-menu">
-
-        <div class="header-left">
+      <!-- Logo -->
+      <div class="header-left">
+        <RouterLink to="/home" class="logo-link">
           <img :src="logo" alt="Logo" class="logo" />
-        </div>
+        </RouterLink>
+      </div>
 
-        <div class="header-center">
-          <RouterLink to="/home">Home</RouterLink>
-          <RouterLink to="/Budget">Budget</RouterLink>
-          <RouterLink to="/expenses">Expenses</RouterLink>
-          <RouterLink to="/income">Income</RouterLink>
-          <RouterLink to="/stocks">Stocks</RouterLink>
-          <RouterLink to="/saving">Saving</RouterLink>
-          <RouterLink to="/report">Report</RouterLink>
-        </div>
+      <!-- Navigation -->
+      <div class="header-center">
+        <RouterLink to="/home">Home</RouterLink>
+        <RouterLink to="/Budget">Budget</RouterLink>
+        <RouterLink to="/expenses">Expenses</RouterLink>
+        <RouterLink to="/income">Income</RouterLink>
+        <RouterLink to="/stocks">Stocks</RouterLink>
+        <RouterLink to="/saving">Saving</RouterLink>
+        <RouterLink to="/report">Report</RouterLink>
+      </div>
 
-        <div class="header-right">
-          <RouterLink to="/account" class="account-link">
-            <img :src="account" alt="Account" class="account-icon" />
-          </RouterLink>
-        </div>
-      </nav>
+      <!-- Account -->
+      <div class="header-right">
+        <RouterLink to="/account" class="account-link">
+          <img :src="account" alt="Account" class="account-icon" />
+        </RouterLink>
+      </div>
 
+    </nav>
   </header>
 </template>
 
 <style scoped>
 .header-menu {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-
-  max-width: 1100px;
-  margin: 0 auto;
+display: grid;
+grid-template-columns: auto 1fr auto;
+align-items: center;
+max-width: 1100px;
+margin: 0 auto;
 }
 
+/* === Links allgemein === */
 .header-menu a {
-  color: #244a22;
-  font-size: 1.2rem;
-  text-decoration: none;
+color: #244a22;
+font-size: 1.2rem;
+text-decoration: none;
+padding-bottom: 6px;
+transition: color 0.2s ease;
 }
-/* Links */
+
+/* Hover */
+.header-menu a:hover {
+color: #4f8a4c;
+}
+
+/* Aktiver Link */
+.header-menu a.router-link-exact-active {
+border-bottom: 3px solid #244a22;
+font-weight: 600;
+}
+
+/* === Logo === */
 .header-left {
-  justify-self: start;
+justify-self: start;
+}
+
+.logo-link {
+border-bottom: none !important;
 }
 
 .logo {
-  height: 100px;
+height: 100px;
 }
 
-/* Mitte */
+/* === Navigation Mitte === */
 .header-center {
-  justify-self: center;
-  display: flex;
-  gap: 3rem;
+justify-self: center;
+display: flex;
+gap: 3rem;
 }
 
-/* Rechts */
+/* === Rechts === */
 .header-right {
-  justify-self: end;
+justify-self: end;
 }
 
 .account-link {
-  display: flex;
-  align-items: center;
+display: flex;
+align-items: center;
 }
 
 .account-icon {
-  width: 55px;
-  height: 55px;
-  cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.15s ease;
+width: 55px;
+height: 55px;
+cursor: pointer;
+transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 .account-icon:hover {
-  transform: scale(1.05);
-  opacity: 0.85;
+transform: scale(1.05);
+opacity: 0.85;
 }
-
 </style>

@@ -201,7 +201,7 @@ async function remove(id?: number) {
           </div>
         </div>
 
-        <button @click="add" :disabled="!canCreate">Anlegen</button>
+        <button class="add" @click="add" :disabled="!canCreate">Anlegen</button>
       </div>
     </section>
 
@@ -221,7 +221,7 @@ async function remove(id?: number) {
 
         <div class="right">
           <strong class="minus">- {{ e.amount }} €</strong>
-          <button class="danger" @click="remove(e.id)">Löschen</button>
+          <button class="delete" @click="remove(e.id)">Löschen</button>
         </div>
       </article>
 
@@ -272,7 +272,7 @@ input {
   width: 100%;
 }
 
-/* Kategorie Button wie Budget */
+/* Kategorie Button */
 .field {
   height: 52px;
   width: 100%;
@@ -417,8 +417,24 @@ button {
   color: #b91c1c;
 }
 
-.danger {
+.delete {
   background: #ffe3e3;
+  color: #000000;
+}
+
+.delete:hover {
+  background-color: #ffe3e3;
+  color: white;
+}
+
+.add {
+  color: #000000;
+  background-color: #b4dda5;
+}
+
+.add:hover {
+  color: white;
+  background-color: #a7dd91;
 }
 
 .empty {

@@ -301,32 +301,13 @@ function goTo(route: string) {
 .cta {
   padding: 0.55rem 0.9rem;
   border-radius: 12px;
-  border: 1px solid #9ccc8f;
   background: #b4dda5;
   font-weight: 700;
   white-space: nowrap;
 }
 
 .feature-card:hover .cta {
-  background: #5c9644;
-  color: #fff;
-  border-color: #5c9644;
-}
-
-/* Falls du noch Buttons nutzt */
-.btn {
-  padding: 0.8rem 1rem;
-  border-radius: 12px;
-  border: 1px solid #9ccc8f;
   background: #b4dda5;
-  color: #000;
-  cursor: pointer;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.btn:hover {
-  background: #5c9644;
   color: #fff;
 }
 

@@ -28,8 +28,7 @@ const portfolioQuotes = ref<Record<string, Quote>>({})
 // Mehr Beispiele
 const exampleSymbols = [
   'AAPL','MSFT','TSLA','AMZN','NVDA','META','GOOGL','NFLX','AMD','INTC',
-  'BRK.B','JPM','V','MA','DIS','NKE','KO','PEP','WMT','COST',
-  'SAP','ASML','SIE.DE','BMW.DE','VOW3.DE','BAS.DE','ALV.DE','AIR.PA'
+  'PEP','WMT','COST', 'ASML'
 ]
 
 // --- Auto-load debounce ---
@@ -339,10 +338,24 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  background: #e5e7eb;
+  background: #b4dda5;
+  color: #000000;
 }
-.btn:hover { filter: brightness(0.98); }
-.danger { background: #ffe3e3; }
+
+.btn:hover {
+  background-color: #a7dd91;
+  color: white;
+}
+
+.danger {
+  background: #ffe3e3;
+  color: #000000;
+}
+
+.danger:hover {
+  background-color: #ffd2d2;
+  color: white;
+}
 
 /* Beispiele: oben, volle Breite, gleiche Höhe wie input */
 .examples-bar {
@@ -390,14 +403,6 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
   margin-bottom: 0.35rem;
 }
 
-.input {
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  height: 44px;            /* gleiche Höhe wie Beispiele */
-}
-
 .symbol-input {
   width: 100%;
   height: 44px;
@@ -415,6 +420,13 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
 .btn-wide {
   flex: 1;                 /* exakt gleich breit */
   text-align: center;
+  background-color: #b4dda5;
+  color: #000000;
+}
+
+.btn-wide:hover {
+  background-color: #b4dda5;
+  color: white;
 }
 
 /* Quote Tabelle */

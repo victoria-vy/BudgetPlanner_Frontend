@@ -224,7 +224,7 @@ function renderCharts() {
         layout: {
           padding: { top: 8, right: 10, bottom: 22, left: 10 },
         },
-        // ✅ Fix: radius/cutout gehören bei dir als Typ offenbar in options, nicht ins Dataset
+        // Fix: radius/cutout gehören bei dir als Typ offenbar in options, nicht ins Dataset
         radius: "90%",
         cutout: "60%",
         plugins: {
@@ -518,7 +518,6 @@ const savingsPct = computed(() => {
 .report {
   width: 900px;
   padding: 2rem;
-  font-family: "Apple Braille";
 }
 .error {
   color: red;
@@ -535,7 +534,7 @@ const savingsPct = computed(() => {
 /* Filter: volle Breite (2 Dropdowns + Button) */
 .row-filter {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 380px 380px 80px;
   gap: 0.75rem;
   align-items: center;
   width: 100%;
@@ -609,8 +608,15 @@ button {
 }
 
 .load-btn {
-  height: 52px;
-  align-self: stretch;
+  height: 40px;
+  align-self: center;
+  background-color: #b4dda5;
+  color: #000000;
+}
+
+.load-btn:hover{
+  background-color: #b4dda5;
+  color: white;
 }
 
 /* Summary */
