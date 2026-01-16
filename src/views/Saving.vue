@@ -38,6 +38,16 @@ function onDocClick(e: MouseEvent) {
   if (!t.closest(".dd")) closeAll();
 }
 
+function getErrorMessage(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (typeof e === "object" && e !== null && "message" in e) {
+    const msg = (e as { message?: unknown }).message;
+    if (typeof msg === "string") return msg;
+  }
+  if (typeof e === "string") return e;
+  return "Fehler";
+}
+
 onMounted(() => {
   load();
   document.addEventListener("click", onDocClick);
@@ -50,8 +60,8 @@ async function load() {
   errorMsg.value = "";
   try {
     goals.value = await getSavingsGoals();
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? "Fehler";
+  } catch (e: unknown) {
+    errorMsg.value = getErrorMessage(e) ?? "Fehler";
   }
 }
 
@@ -71,31 +81,31 @@ function formatEuro(v: number) {
 }
 
 // Emoji pro Kategorie
-function iconForCategory(cat: SavingsCategory): string {
-  switch (cat) {
-    case "HOME": return "🏠";
-    case "TRAVEL": return "✈️";
-    case "CAR": return "🚗";
-    case "EDUCATION": return "🎓";
-    case "EMERGENCY": return "🛟";
-    case "GIFTS": return "🎁";
-    case "TECH": return "💻";
-    case "OTHER": return "💰";
-    default: return "💰";
+function iconForCategory(cat?: SavingsCategory): string {
+  switch (cat ?? 'OTHER') {
+    case 'HOME': return '🏠'
+    case 'TRAVEL': return '✈️'
+    case 'CAR': return '🚗'
+    case 'EDUCATION': return '🎓'
+    case 'EMERGENCY': return '🛟'
+    case 'GIFTS': return '🎁'
+    case 'TECH': return '💻'
+    case 'OTHER': return '💰'
+    default: return '💰'
   }
 }
 
-function labelForCategory(cat: SavingsCategory): string {
-  switch (cat) {
-    case "HOME": return "Wohnen";
-    case "TRAVEL": return "Reise";
-    case "CAR": return "Auto";
-    case "EDUCATION": return "Bildung";
-    case "EMERGENCY": return "Notgroschen";
-    case "GIFTS": return "Geschenke";
-    case "TECH": return "Technik";
-    case "OTHER": return "Sonstiges";
-    default: return "Sonstiges";
+function labelForCategory(cat?: SavingsCategory): string {
+  switch (cat ?? 'OTHER') {
+    case 'HOME': return 'Wohnen'
+    case 'TRAVEL': return 'Reise'
+    case 'CAR': return 'Auto'
+    case 'EDUCATION': return 'Bildung'
+    case 'EMERGENCY': return 'Notgroschen'
+    case 'GIFTS': return 'Geschenke'
+    case 'TECH': return 'Technik'
+    case 'OTHER': return 'Sonstiges'
+    default: return 'Sonstiges'
   }
 }
 
@@ -146,8 +156,8 @@ async function addGoal() {
     newCurrentText.value = "";
     newCategory.value = "OTHER";
     closeAll();
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? "Fehler beim Erstellen";
+  } catch (e: unknown) {
+    errorMsg.value = getErrorMessage(e) ?? "Fehler beim Erstellen";
   }
 }
 
@@ -162,8 +172,8 @@ async function addAmount(goal: SavingsGoal, delta: number) {
   try {
     const saved = await updateSavingsGoal(goal.id, updated);
     goals.value = goals.value.map((g) => (g.id === goal.id ? saved : g));
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? "Fehler beim Aktualisieren";
+  } catch (e: unknown) {
+    errorMsg.value = getErrorMessage(e) ?? "Fehler beim Aktualisieren";
   }
 }
 
@@ -172,8 +182,8 @@ async function remove(goal: SavingsGoal) {
   try {
     await deleteSavingsGoal(goal.id);
     goals.value = goals.value.filter((g) => g.id !== goal.id);
-  } catch (e: any) {
-    errorMsg.value = e?.message ?? "Fehler beim Löschen";
+  } catch (e: unknown) {
+    errorMsg.value = getErrorMessage(e) ?? "Fehler beim Löschen";
   }
 }
 </script>
