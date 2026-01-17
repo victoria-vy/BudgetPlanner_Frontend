@@ -27,10 +27,12 @@ const showHeader = computed(() => !route.meta.hideHeader)
 
 :root {
   font-family: Arial;
+  color: #244a22;
 }
 
 button, input, select, textarea {
   font-family: inherit;
+  color: inherit;
 }
 
 .app-layout {

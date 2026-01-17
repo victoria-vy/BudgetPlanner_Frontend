@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import TradingViewChart from '@/components/TradingViewChart.vue'
 import { mapToTradingViewSymbol } from '@/service/TradingViewSymbol'
 
@@ -15,6 +15,22 @@ import {
 
 import type { Stock } from '@/models/Stock'
 import { isLoggedIn } from '@/service/authService.ts'
+
+type StockId = Exclude<Stock['id'], null | undefined>
+
+type PortfolioRow = {
+  symbol: string
+  tvSymbol: string
+  name?: string
+  quantity: number
+  avgBuyPrice?: number
+  buyDate?: string
+  ids: StockId[]
+}
+
+function hasId(s: Stock): s is Stock & { id: StockId } {
+  return s.id !== null && s.id !== undefined
+}
 
 const symbol = ref('AAPL') // Startsymbol, damit immer etwas angezeigt wird
 const errorMsg = ref('')
@@ -142,15 +158,11 @@ async function saveStock() {
   }
 }
 
-async function removeStock(stock: Stock) {
-  if (!stock.id) {
-    errorMsg.value = 'Stock hat keine ID.'
-    return
-  }
+async function removeRow(row: PortfolioRow) {
   errorMsg.value = ''
   try {
-    await deleteStock(stock.id)
-    savedStocks.value = savedStocks.value.filter(s => s.id !== stock.id)
+    await Promise.all(row.ids.map(id => deleteStock(id)))
+    savedStocks.value = savedStocks.value.filter(s => (s.symbol ?? '').toUpperCase() !== row.symbol)
     await reloadPortfolioQuotes()
   } catch (e: unknown) {
     errorMsg.value = getErrorMessage(e) || 'Fehler beim Löschen'
@@ -182,11 +194,104 @@ function formatDate(dateStr?: string): string {
 
 const todayFormatted = new Date().toLocaleDateString('de-DE')
 
-function perfForStock(s: Stock): { pct: number; text: string } | null {
-  const q = portfolioQuotes.value?.[s.symbol?.toUpperCase()]
-  if (!q?.c || !s.buyPrice || s.buyPrice <= 0) return null
+function formatMoney(n?: number): string {
+  if (typeof n !== 'number' || !isFinite(n)) return '—'
+  return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
 
-  const pct = ((Number(q.c) - Number(s.buyPrice)) / Number(s.buyPrice)) * 100
+function formatQuote(
+  value?: number,
+  currency: 'USD' | 'EUR' = 'USD'
+): string {
+  if (typeof value !== 'number' || !isFinite(value)) return '—'
+
+  return new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(value)
+}
+
+function currencyForSymbol(sym: string): 'USD' | 'EUR' {
+  return sym.endsWith('.DE') ? 'EUR' : 'USD'
+}
+
+function currentPriceFor(sym: string): number | undefined {
+  const q = portfolioQuotes.value?.[sym.toUpperCase()]
+  const c = Number(q?.c)
+  return isFinite(c) ? c : undefined
+}
+
+function positionValueForRow(row: PortfolioRow): number | undefined {
+  const c = currentPriceFor(row.symbol)
+  if (c === undefined) return undefined
+  return c * row.quantity
+}
+
+/**
+ * Aggregiert savedStocks -> genau 1 UI-Zeile pro Symbol (Stückzahl + Ø Kaufpreis + IDs sammeln)
+ * Backend bleibt unverändert.
+ */
+const portfolioRows = computed<PortfolioRow[]>(() => {
+  const map = new Map<string, PortfolioRow>()
+
+  for (const s of savedStocks.value) {
+    const sym = (s.symbol ?? '').toUpperCase()
+    if (!sym) continue
+
+    const qty = Number(s.quantity ?? 1) || 1
+    const bp = typeof s.buyPrice === 'number' ? s.buyPrice : undefined
+
+    const ex = map.get(sym)
+    if (!ex) {
+      map.set(sym, {
+        symbol: sym,
+        tvSymbol: s.tvSymbol ?? mapToTradingViewSymbol(sym),
+        name: s.name,
+        quantity: qty,
+        avgBuyPrice: bp,
+        buyDate: s.buyDate,
+        ids: hasId(s) ? [s.id] : []
+      })
+      continue
+    }
+
+    const prevQty = ex.quantity
+    ex.quantity = prevQty + qty
+
+    if (hasId(s)) ex.ids.push(s.id)
+
+    // frühestes Kaufdatum behalten (damit deine Anzeige stabil bleibt)
+    if (s.buyDate) {
+      if (!ex.buyDate) ex.buyDate = s.buyDate
+      else if (new Date(s.buyDate).getTime() < new Date(ex.buyDate).getTime()) ex.buyDate = s.buyDate
+    }
+
+    // gewichteter Ø Kaufpreis
+    if (bp !== undefined) {
+      if (ex.avgBuyPrice === undefined) {
+        ex.avgBuyPrice = bp
+      } else {
+        const prevTotal = ex.avgBuyPrice * prevQty
+        const newTotal = bp * qty
+        const denom = prevQty + qty
+        ex.avgBuyPrice = denom > 0 ? (prevTotal + newTotal) / denom : ex.avgBuyPrice
+      }
+    }
+
+    if (!ex.name && s.name) ex.name = s.name
+  }
+
+  return Array.from(map.values())
+})
+
+function perfForRow(row: PortfolioRow): { pct: number; text: string } | null {
+  const c = currentPriceFor(row.symbol)
+  if (c === undefined) return null
+  if (!row.avgBuyPrice || row.avgBuyPrice <= 0) return null
+
+  const pct = ((c - row.avgBuyPrice) / row.avgBuyPrice) * 100
   const sign = pct >= 0 ? '+' : ''
   return { pct, text: `${sign}${pct.toFixed(2)}%` }
 }
@@ -248,11 +353,11 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
           </thead>
           <tbody>
           <tr>
-            <td>{{ quote.c }}</td>
-            <td>{{ quote.o }}</td>
-            <td>{{ quote.h }}</td>
-            <td>{{ quote.l }}</td>
-            <td>{{ quote.pc }}</td>
+            <td>{{ formatQuote(quote.c, currencyForSymbol(symbol)) }}</td>
+            <td>{{ formatQuote(quote.o, currencyForSymbol(symbol)) }}</td>
+            <td>{{ formatQuote(quote.h, currencyForSymbol(symbol)) }}</td>
+            <td>{{ formatQuote(quote.l, currencyForSymbol(symbol)) }}</td>
+            <td>{{ formatQuote(quote.pc, currencyForSymbol(symbol)) }}</td>
           </tr>
           </tbody>
         </table>
@@ -283,27 +388,32 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
       </div>
 
       <ul v-if="savedStocks.length">
-        <li v-for="s in savedStocks" :key="s.id ?? s.symbol" class="stock-row">
-          <button class="pf-btn" @click="openFromPortfolio(s)">
+        <li v-for="r in portfolioRows" :key="r.symbol" class="stock-row">
+          <button class="pf-btn" @click="openFromPortfolio(r as any)">
             <span class="pf-title">
-              {{ s.name ? `${s.name} (${s.symbol})` : s.symbol }}
+              {{ r.name ? `${r.name} (${r.symbol})` : r.symbol }}
             </span>
-            <span class="pf-dates">
-              · {{ formatDate(s.buyDate) }} → {{ todayFormatted }}
+
+            <span class="pf-dates pf-inline">
+              · {{ r.quantity }} Stk
+              · Ø Kauf: {{ formatMoney(r.avgBuyPrice) }}
+              · Jetzt: {{ formatMoney(currentPriceFor(r.symbol)) }}
+              · Gesamt: {{ formatMoney(positionValueForRow(r)) }}
+              · {{ formatDate(r.buyDate) }} → {{ todayFormatted }}
             </span>
           </button>
 
           <span
-            v-if="perfForStock(s)"
+            v-if="perfForRow(r)"
             class="perf"
-            :class="perfForStock(s)!.pct >= 0 ? 'pos' : 'neg'"
-            title="Performance seit Kauf (gegen buyPrice)"
+            :class="perfForRow(r)!.pct >= 0 ? 'pos' : 'neg'"
+            title="Performance seit Kauf (gegen Ø buyPrice)"
           >
-            {{ perfForStock(s)!.text }}
-          </span>
+      {{ perfForRow(r)!.text }}
+    </span>
           <span v-else class="perf neutral">—</span>
 
-          <button class="btn danger" @click="removeStock(s)">Löschen</button>
+          <button class="btn danger" @click="removeRow(r)">Löschen</button>
         </li>
       </ul>
 
@@ -366,6 +476,7 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   background: #fafafa;
+  color: #000000;
 }
 
 .examples-label {
@@ -539,4 +650,13 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
   color: #6b7280;
   white-space: nowrap;
 }
+
+/* Inline-Infos im selben Stil wie pf-dates, nur robust für eine Zeile */
+.pf-inline {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
 </style>

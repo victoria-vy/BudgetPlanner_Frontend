@@ -147,8 +147,7 @@ function goTo(route: string) {
 }
 
 /* Gemeinsamer Panel-Look (links + rechts) */
-.mascot-card,
-.features {
+.mascot-card {
   background: #fff;
   border: 1px solid #e5e5e5;
   border-radius: 18px;
@@ -199,13 +198,13 @@ function goTo(route: string) {
 
 .speech-title {
   font-weight: 700;
-  color: #083a4b;
+  color: #1b2550;
   margin-bottom: 0.35rem;
 }
 
 .speech-text {
   margin: 0;
-  color: #374151;
+  color: #1b2550;
   line-height: 1.35;
 }
 
@@ -287,12 +286,10 @@ function goTo(route: string) {
 
 .feature-title {
   font-weight: 700;
-  color: #083a4b;
 }
 
 .feature-desc {
   margin: 0.15rem 0 0;
-  color: #6b7280;
   font-size: 0.95rem;
 }
 
