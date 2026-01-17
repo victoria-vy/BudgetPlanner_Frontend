@@ -132,7 +132,6 @@ function goTo(route: string) {
   justify-content: center;      /* horizontal */
   align-items: center;          /* vertikal */
   padding: 2.5rem 2rem;
-  font-family: "Apple Braille";
 }
 
 /* Grid: beide Spalten gleich hoch */

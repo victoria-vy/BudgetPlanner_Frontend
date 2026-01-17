@@ -219,7 +219,6 @@ async function remove(id?: number) {
 .page {
   width: 900px;
   padding: 2rem;
-  font-family: "Apple Braille";
 }
 
 .error {

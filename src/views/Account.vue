@@ -325,13 +325,6 @@ function handleLogout() {
   border-color: #9cc8ff;
 }
 
-.actions {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 1rem;
-  align-items: center;
-}
-
 .btn {
   border: none;
   border-radius: 12px;

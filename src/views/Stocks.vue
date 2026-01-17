@@ -320,7 +320,6 @@ function perfForStock(s: Stock): { pct: number; text: string } | null {
 .stocks {
   width: 900px;
   padding: 2rem;
-  font-family: "Apple Braille";
 }
 
 .card {

@@ -234,7 +234,6 @@ onMounted(loadMe);
 .account {
   width: 900px;
   padding: 2rem;
-  font-family: "Apple Braille";
 }
 
 .page-head {

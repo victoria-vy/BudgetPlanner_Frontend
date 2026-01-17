@@ -341,7 +341,6 @@ async function remove(goal: SavingsGoal) {
 .savings {
   width: 900px;
   padding: 2rem;
-  font-family: "Apple Braille";
 }
 .error {
   color: red;
