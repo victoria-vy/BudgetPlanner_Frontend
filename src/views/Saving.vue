@@ -363,6 +363,11 @@ async function remove(goal: SavingsGoal) {
   align-items: center;
 }
 
+/* EXTREM wichtig für Windows */
+.row > * {
+  min-width: 0;
+}
+
 /* Einheitliche Höhe */
 input {
   height: 52px;
