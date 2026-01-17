@@ -138,7 +138,7 @@ async function remove(id?: number) {
     <p v-if="errorMsg" class="error">{{ errorMsg }}</p>
 
     <section class="card">
-      <h2>Neue Ausgabe</h2>
+      <h2>Neue Ausgabe eintragen:</h2>
 
       <div class="row">
         <input v-model="title" placeholder="Titel (z.B. Einkauf)" />

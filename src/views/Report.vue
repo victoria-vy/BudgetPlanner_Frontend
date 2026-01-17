@@ -299,6 +299,20 @@ function euro(v: number) {
   );
 }
 
+function percentClass(r: { budgetLimit: number; remaining: number }) {
+  // Kein Budget gesetzt -> kennzeichnen
+  if (!Number.isFinite(r.budgetLimit) || r.budgetLimit <= 0) return "no-budget";
+
+  // Noch übrig -> grün, sonst rot
+  return r.remaining > 0 ? "plus" : "minus";
+}
+
+function percentTitle(r: { budgetLimit: number; remaining: number }) {
+  if (!Number.isFinite(r.budgetLimit) || r.budgetLimit <= 0) return "Kein Budget eingetragen";
+  return r.remaining > 0 ? "Budget übrig" : "Budget aufgebraucht";
+}
+
+
 // --- Stocks KPIs ---
 const stocksCount = computed(() => stocks.value.length);
 
@@ -353,7 +367,7 @@ const savingsPct = computed(() => {
 
     <!-- Filter -->
     <section class="card">
-      <h2>Monat auswählen</h2>
+      <h2>Monat auswählen:</h2>
 
       <div class="row-filter">
         <!-- Jahr Dropdown (Budgets-Style) -->
@@ -415,17 +429,17 @@ const savingsPct = computed(() => {
     <!-- Summary -->
     <section v-if="data" class="card summary">
       <div class="summary-item">
-        <div class="label">Income</div>
+        <div class="label">Income:</div>
         <div class="value plus">{{ euro(data.incomeSum) }}</div>
       </div>
 
       <div class="summary-item">
-        <div class="label">Expenses</div>
+        <div class="label">Expenses:</div>
         <div class="value minus">{{ euro(data.expenseSum) }}</div>
       </div>
 
       <div class="summary-item">
-        <div class="label">Netto</div>
+        <div class="label">Rest:</div>
         <div class="value" :class="data.net >= 0 ? 'plus' : 'minus'">{{ euro(data.net) }}</div>
       </div>
     </section>
@@ -433,17 +447,17 @@ const savingsPct = computed(() => {
     <!-- Stocks Summary -->
     <section class="card summary">
       <div class="summary-item">
-        <div class="label">Stocks</div>
+        <div class="label">Anzahl Stocks:</div>
         <div class="value">{{ stocksCount }}</div>
       </div>
 
       <div class="summary-item">
-        <div class="label">Stocks Wert</div>
+        <div class="label">Stocks Gesamtwert:</div>
         <div class="value">{{ euro(stocksMarketValue) }}</div>
       </div>
 
       <div class="summary-item">
-        <div class="label">Stocks P/L</div>
+        <div class="label">Stocks P/L:</div>
         <div class="value" :class="stocksPnL >= 0 ? 'plus' : 'minus'">
           {{ euro(stocksPnL) }} ({{ stocksPnLPct.toFixed(2) }}%)
         </div>
@@ -453,17 +467,17 @@ const savingsPct = computed(() => {
     <!-- Savings Summary -->
     <section class="card summary">
       <div class="summary-item">
-        <div class="label">Savings Ziele</div>
+        <div class="label">Anzahl Savings:</div>
         <div class="value">{{ goalsCount }}</div>
       </div>
 
       <div class="summary-item">
-        <div class="label">Gespart</div>
+        <div class="label">Gespart:</div>
         <div class="value plus">{{ euro(savingsCurrentTotal) }}</div>
       </div>
 
       <div class="summary-item">
-        <div class="label">Fortschritt</div>
+        <div class="label">Ø Fortschritt:</div>
         <div class="value">{{ savingsPct.toFixed(0) }}%</div>
       </div>
     </section>
@@ -476,11 +490,11 @@ const savingsPct = computed(() => {
         <table>
           <thead>
           <tr>
-            <th>Kategorie</th>
-            <th>Budget</th>
-            <th>Ausgaben</th>
-            <th>Rest</th>
-            <th>%</th>
+            <th>Kategorie:</th>
+            <th>Budget:</th>
+            <th>Ausgaben:</th>
+            <th>Rest:</th>
+            <th>% benutzt:</th>
           </tr>
           </thead>
           <tbody>
@@ -489,7 +503,13 @@ const savingsPct = computed(() => {
             <td>{{ euro(r.budgetLimit) }}</td>
             <td class="minus">{{ euro(r.spent) }}</td>
             <td :class="r.remaining >= 0 ? 'plus' : 'minus'">{{ euro(r.remaining) }}</td>
-            <td>{{ r.percentUsed }}%</td>
+            <td
+              :class="percentClass(r)"
+              :title="percentTitle(r)"
+            >
+              {{ r.percentUsed }}%
+            </td>
+
           </tr>
           </tbody>
         </table>
@@ -499,13 +519,13 @@ const savingsPct = computed(() => {
     <!-- Charts -->
     <section v-if="data" class="charts">
       <div class="card chart-card">
-        <h2>Budget vs Ausgaben</h2>
+        <h2>Budget vs Ausgaben:</h2>
         <canvas ref="barCanvas"></canvas>
         <div v-if="barClickInfo" class="click-info">{{ barClickInfo }}</div>
       </div>
 
       <div class="card chart-card">
-        <h2>Ausgaben-Verteilung</h2>
+        <h2>Ausgaben-Verteilung:</h2>
         <canvas ref="pieCanvas"></canvas>
         <div v-if="pieClickInfo" class="click-info">{{ pieClickInfo }}</div>
       </div>
@@ -747,5 +767,9 @@ button {
   .load-btn {
     width: 100%;
   }
+}
+
+.no-budget {
+  color: #6b7280;
 }
 </style>

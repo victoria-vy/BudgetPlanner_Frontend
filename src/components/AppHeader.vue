@@ -17,11 +17,11 @@ import account from '@/assets/Account.png'
       <!-- Navigation -->
       <div class="header-center">
         <RouterLink to="/home">Home</RouterLink>
-        <RouterLink to="/Budget">Budget</RouterLink>
+        <RouterLink to="/Budget">Budgets</RouterLink>
         <RouterLink to="/expenses">Expenses</RouterLink>
         <RouterLink to="/income">Income</RouterLink>
         <RouterLink to="/stocks">Stocks</RouterLink>
-        <RouterLink to="/saving">Saving</RouterLink>
+        <RouterLink to="/saving">Savings</RouterLink>
         <RouterLink to="/report">Report</RouterLink>
       </div>
 
@@ -96,14 +96,19 @@ align-items: center;
 }
 
 .account-icon {
-width: 55px;
-height: 55px;
+width: 50px;
+height: 50px;
 cursor: pointer;
 transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 .account-icon:hover {
-transform: scale(1.05);
+transform: scale(1.10);
 opacity: 0.85;
+}
+
+.logo:hover {
+  transform: scale(1.10);
+  opacity: 0.85;
 }
 </style>

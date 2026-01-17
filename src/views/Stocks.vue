@@ -321,7 +321,7 @@ function perfForRow(row: PortfolioRow): { pct: number; text: string } | null {
       </div>
 
       <!-- Symbol Input: volle Breite -->
-      <label class="label">Symbol</label>
+      <label class="label">Symbol eingeben:</label>
 
       <input
         v-model="symbol"
@@ -344,11 +344,11 @@ function perfForRow(row: PortfolioRow): { pct: number; text: string } | null {
         <table>
           <thead>
           <tr>
-            <th>Aktuell</th>
-            <th>Open</th>
-            <th>High</th>
-            <th>Low</th>
-            <th>Prev Close</th>
+            <th>Aktuell:</th>
+            <th>Open:</th>
+            <th>High:</th>
+            <th>Low:</th>
+            <th>Prev Close:</th>
           </tr>
           </thead>
           <tbody>

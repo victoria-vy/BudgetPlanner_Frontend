@@ -263,7 +263,7 @@ function displayTitle(b: Budget) {
     <p v-if="errorMsg" class="error">{{ errorMsg }}</p>
 
     <section class="card">
-      <h2>Neues Budget</h2>
+      <h2>Neues Budget anlegen: </h2>
 
       <div class="row">
         <input v-model="title" placeholder="Titel (z.B. Wocheneinkauf)" />
@@ -271,7 +271,7 @@ function displayTitle(b: Budget) {
         <!-- Monat als "Monat, Jahr" (Komma egal), gespeichert als YYYY-MM -->
         <input
           v-model="monthText"
-          placeholder="Monat, Jahr (z.B. Januar 2026)"
+          placeholder="Monat, Jahr"
           @blur="normalizeMonthField"
         />
 

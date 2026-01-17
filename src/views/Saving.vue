@@ -196,7 +196,7 @@ async function remove(goal: SavingsGoal) {
 
     <!-- New Goal -->
     <section class="new-goal card">
-      <h2>Neues Sparziel</h2>
+      <h2>Neues Sparziel anlegen:</h2>
 
       <div class="row">
         <input v-model="newTitle" placeholder="Titel (z.B. Sommer-Festival-Reise)" />
