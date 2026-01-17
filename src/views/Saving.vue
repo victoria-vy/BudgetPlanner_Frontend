@@ -470,10 +470,15 @@ input {
 }
 
 button {
-  padding: 0.8rem 1rem;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+  appearance: none;
+  -webkit-appearance: none;
   border-radius: 12px;
   border: none;
-  cursor: pointer;
 }
 
 .goals {

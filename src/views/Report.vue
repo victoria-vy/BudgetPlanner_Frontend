@@ -628,7 +628,7 @@ button {
 }
 
 .load-btn {
-  height: 40px;
+  height: 38px;
   align-self: center;
   background-color: #b4dda5;
   color: #000000;
