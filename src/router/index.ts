@@ -6,8 +6,8 @@ import ExpensesView from "@/views/ExpensesView.vue";
 import IncomeView from "@/views/IncomeView.vue";
 import ReportView from "@/views/ReportView.vue";
 import HomeView from "@/views/HomeView.vue";
-import Impressum from "@/views/Impressum.vue";
-import Datenschutzerklärung from "@/views/Datenschutzerklärung.vue";
+import ImpressumView from "@/views/ImpressumView.vue";
+import DatenschutzerklRungView from "@/views/DatenschutzerklärungView.vue";
 import AGB from "@/views/AGB.vue";
 import StocksView from "@/views/StocksView.vue";
 import SavingView from "@/views/SavingView.vue";
@@ -34,12 +34,12 @@ const router = createRouter({
       component: AGB,
     },
     {
-      path: "/Impressum",
-      component: Impressum,
+      path: "/ImpressumView",
+      component: ImpressumView,
     },
     {
-      path: "/Datenschutzerklärung",
-      component: Datenschutzerklärung,
+      path: "/DatenschutzerklärungView",
+      component: DatenschutzerklRungView,
     },
 
     //Protected (nur eingeloggt)

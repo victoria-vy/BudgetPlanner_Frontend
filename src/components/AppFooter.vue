@@ -6,9 +6,9 @@
 
     <nav class="footer-menu">
       <p class="copyright">© 2025 MoneyManager</p>
-      <RouterLink to="/impressum">Impressum</RouterLink>
-      <RouterLink to="/datenschutzerklärung">Datenschutzerklärung</RouterLink>
-      <RouterLink to="/agb">AGB</RouterLink>
+      <RouterLink to="/ImpressumView">Impressum</RouterLink>
+      <RouterLink to="/DatenschutzerklärungView">Datenschutzerklärung</RouterLink>
+      <RouterLink to="/AGB">AGB</RouterLink>
     </nav>
 
   </footer>
