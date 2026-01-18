@@ -7,7 +7,7 @@ import account from '@/assets/Account.png'
   <header class="header">
     <nav class="header-menu">
 
-      <!-- Logo -->
+      <!-- Log -->
       <div class="header-left">
         <RouterLink to="/home" class="logo-link">
           <img :src="logo" alt="Logo" class="logo" />
@@ -38,73 +38,73 @@ import account from '@/assets/Account.png'
 
 <style scoped>
 .header-menu {
-display: grid;
-grid-template-columns: auto 1fr auto;
-align-items: center;
-max-width: 1100px;
-margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
-/* === Links allgemein === */
+/* Links allgemein */
 .header-menu a {
-color: #244a22;
-font-size: 1.2rem;
-text-decoration: none;
-padding-bottom: 6px;
-transition: color 0.2s ease;
+  color: #244a22;
+  font-size: 1.2rem;
+  text-decoration: none;
+  padding-bottom: 6px;
+  transition: color 0.2s ease;
 }
 
 /* Hover */
 .header-menu a:hover {
-color: #4f8a4c;
+  color: #4f8a4c;
 }
 
 /* Aktiver Link */
 .header-menu a.router-link-exact-active {
-border-bottom: 3px solid #244a22;
-font-weight: 600;
+  border-bottom: 3px solid #244a22;
+  font-weight: 600;
 }
 
-/* === Logo === */
+/* Logo */
 .header-left {
-justify-self: start;
+  justify-self: start;
 }
 
 .logo-link {
-border-bottom: none !important;
+  border-bottom: none !important;
 }
 
 .logo {
-height: 100px;
+  height: 100px;
 }
 
-/* === Navigation Mitte === */
+/* Navigation Mitte */
 .header-center {
-justify-self: center;
-display: flex;
-gap: 3rem;
+  justify-self: center;
+  display: flex;
+  gap: 3rem;
 }
 
-/* === Rechts === */
+/* Rechts */
 .header-right {
-justify-self: end;
+  justify-self: end;
 }
 
 .account-link {
-display: flex;
-align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .account-icon {
-width: 50px;
-height: 50px;
-cursor: pointer;
-transition: transform 0.15s ease, opacity 0.15s ease;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 .account-icon:hover {
-transform: scale(1.10);
-opacity: 0.85;
+  transform: scale(1.10);
+  opacity: 0.85;
 }
 
 .logo:hover {
