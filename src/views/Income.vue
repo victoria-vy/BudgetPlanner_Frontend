@@ -127,7 +127,7 @@ async function remove(id?: number) {
       <div class="row">
         <input v-model="title" placeholder="Titel (z.B. Gehalt)" />
 
-        <!-- Betrag: editierbar + Dropdown Presets -->
+        <!-- Betrag: editierbar + Dropdown -->
         <div class="dd">
           <div class="combo">
             <input
@@ -333,7 +333,7 @@ input {
   border-radius: 12px;
   overflow: hidden;
   z-index: 50;
-  height: 52px;
+  height: auto;
 }
 
 .dd-item {
