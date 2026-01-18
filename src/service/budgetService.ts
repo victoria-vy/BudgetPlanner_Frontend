@@ -1,6 +1,8 @@
 import { authHeader } from '@/service/authService'
 import type { Budget } from '@/models/Budget'
 
+// Funktionen für Budgets
+
 const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL
 
 export async function getBudgets(): Promise<Budget[]> {

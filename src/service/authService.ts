@@ -1,5 +1,7 @@
 const KEY = "budgetplanner_token";
 
+//Funktionen für Login, Registrieren, Account, Logout, Profil und Header-Zugriff
+
 export function setToken(token: string) {
   sessionStorage.setItem(KEY, token);
 }

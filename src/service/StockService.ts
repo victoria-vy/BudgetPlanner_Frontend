@@ -1,6 +1,8 @@
 import type { Stock } from '@/models/Stock'
 import { authHeader } from '@/service/authService.ts'
 
+// Funktionen für Stocks und Finnhub
+
 const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL
 
 export type Quote = { s: string; c: number; h: number; l: number; o: number; pc: number; message?: string }

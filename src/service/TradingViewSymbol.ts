@@ -1,3 +1,5 @@
+//Funktion für TradingView Chart
+
 export function mapToTradingViewSymbol(input: string): string {
   const s = input.trim().toUpperCase()
 

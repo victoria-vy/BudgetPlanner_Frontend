@@ -1,6 +1,8 @@
 import type { SavingsGoal } from '@/models/SavingsGoal'
 import { authHeader } from '@/service/authService.ts'
 
+// Funktion für Savings
+
 const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL
 
 export async function getSavingsGoals(): Promise<SavingsGoal[]> {

@@ -1,6 +1,8 @@
 import { authHeader } from '@/service/authService'
 import type { Expense } from '@/models/Expense'
 
+//Funktionen für Expenses
+
 const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL
 
 export async function getExpenses(): Promise<Expense[]> {

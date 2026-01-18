@@ -40,7 +40,7 @@ type RegisterErrorBody =
   | null;
 
 onMounted(() => {
-  if (isLoggedIn()) router.replace("/Profile");
+  if (isLoggedIn()) router.replace("/ProfileView");
 });
 
 async function handleLogin() {
@@ -84,7 +84,7 @@ async function handleLogin() {
 
     setToken(token);
     alert("Login erfolgreich");
-    await router.push("/Profile");
+    await router.push("/ProfileView");
   } catch (e: unknown) {
     console.error(e);
     alert(`Login fehlgeschlagen: ${getErrorMessage(e)}`);

@@ -1,6 +1,8 @@
 import { authHeader } from '@/service/authService'
 import type { ReportResponse } from '@/models/Report'
 
+// Funktion für Report
+
 const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL
 
 export async function getReport(month: string): Promise<ReportResponse> {

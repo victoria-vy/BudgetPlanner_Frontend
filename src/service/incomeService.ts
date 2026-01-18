@@ -1,6 +1,8 @@
 import { authHeader } from '@/service/authService'
 import type { Income } from '@/models/Income'
 
+//Funktionen für Income
+
 const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL
 
 export async function getIncome(): Promise<Income[]> {

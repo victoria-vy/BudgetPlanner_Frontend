@@ -160,7 +160,7 @@ async function updateEmail() {
 
 function logout() {
   clearToken();
-  router.push("/account");
+  router.push("/AccountView");
 }
 
 onMounted(loadMe);
