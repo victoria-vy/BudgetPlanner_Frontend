@@ -16,18 +16,18 @@ import account from '@/assets/Account.png'
 
       <!-- Navigation -->
       <div class="header-center">
-        <RouterLink to="/home">Home</RouterLink>
-        <RouterLink to="/Budget">Budgets</RouterLink>
-        <RouterLink to="/expenses">Expenses</RouterLink>
-        <RouterLink to="/income">Income</RouterLink>
-        <RouterLink to="/stocks">Stocks</RouterLink>
-        <RouterLink to="/saving">Savings</RouterLink>
-        <RouterLink to="/report">Report</RouterLink>
+        <RouterLink to="/HomeView">Home</RouterLink>
+        <RouterLink to="/BudgetView">Budgets</RouterLink>
+        <RouterLink to="/ExpensesView">Expenses</RouterLink>
+        <RouterLink to="/IncomeView">Income</RouterLink>
+        <RouterLink to="/StocksView">Stocks</RouterLink>
+        <RouterLink to="/SavingView">Savings</RouterLink>
+        <RouterLink to="/ReportView">Report</RouterLink>
       </div>
 
       <!-- Account -->
       <div class="header-right">
-        <RouterLink to="/account" class="account-link">
+        <RouterLink to="/AccountView" class="account-link">
           <img :src="account" alt="Account" class="account-icon" />
         </RouterLink>
       </div>

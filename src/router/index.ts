@@ -1,33 +1,33 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { isLoggedIn } from "@/service/authService";
 
-import Account from "@/views/Account.vue";
-import Expenses from "@/views/Expenses.vue";
-import Income from "@/views/Income.vue";
-import Report from "@/views/Report.vue";
-import Home from "@/views/Home.vue";
+import AccountView from "@/views/AccountView.vue";
+import ExpensesView from "@/views/ExpensesView.vue";
+import IncomeView from "@/views/IncomeView.vue";
+import ReportView from "@/views/ReportView.vue";
+import HomeView from "@/views/HomeView.vue";
 import Impressum from "@/views/Impressum.vue";
 import Datenschutzerklärung from "@/views/Datenschutzerklärung.vue";
 import AGB from "@/views/AGB.vue";
-import Stocks from "@/views/Stocks.vue";
-import Saving from "@/views/Saving.vue";
-import Budget from "@/views/Budget.vue";
+import StocksView from "@/views/StocksView.vue";
+import SavingView from "@/views/SavingView.vue";
+import BudgetView from "@/views/BudgetView.vue";
 
-import Profile from "@/views/Profile.vue";
+import ProfileView from "@/views/ProfileView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: "/home",
-      component: Home,
+      path: "/HomeView",
+      component: HomeView,
       meta: { hideHeader: true },
     },
 
     // Public
     {
-      path: "/Account",
-      component: Account,
+      path: "/AccountView",
+      component: AccountView,
     },
     {
       path: "/AGB",
@@ -44,45 +44,45 @@ const router = createRouter({
 
     //Protected (nur eingeloggt)
     {
-      path: "/Profile",
-      component: Profile,
+      path: "/ProfileView",
+      component: ProfileView,
       meta: { requiresAuth: true },
     },
     {
-      path: "/Expenses",
-      component: Expenses,
+      path: "/ExpensesView",
+      component: ExpensesView,
       meta: { requiresAuth: true },
     },
     {
-      path: "/Income",
-      component: Income,
+      path: "/IncomeView",
+      component: IncomeView,
       meta: { requiresAuth: true },
     },
     {
-      path: "/Report",
-      component: Report,
+      path: "/ReportView",
+      component: ReportView,
       meta: { requiresAuth: true },
     },
     {
-      path: "/Stocks",
-      component: Stocks,
+      path: "/StocksView",
+      component: StocksView,
       meta: { requiresAuth: true },
     },
     {
-      path: "/Saving",
-      component: Saving,
+      path: "/SavingView",
+      component: SavingView,
       meta: { requiresAuth: true },
     },
     {
-      path: "/Budget",
-      component: Budget,
+      path: "/BudgetView",
+      component: BudgetView,
       meta: { requiresAuth: true },
     },
 
     // Standard-Redirect
     {
       path: "/",
-      redirect: "/home",
+      redirect: "/HomeView",
     },
   ],
 });
@@ -91,14 +91,14 @@ router.beforeEach((to) => {
   //Nicht eingeloggt + geschützte Seite
   if (to.meta.requiresAuth && !isLoggedIn()) {
     return {
-      path: "/Account",
+      path: "/AccountView",
       query: { reason: "login_required" },
     };
   }
 
-  //Eingeloggt + Account -> Profile
-  if (to.path === "/Account" && isLoggedIn()) {
-    return "/Profile";
+  //Eingeloggt + AccountView -> ProfileView
+  if (to.path === "/AccountView" && isLoggedIn()) {
+    return "/ProfileView";
   }
 });
 

@@ -31,7 +31,7 @@ function goTo(route: string) {
       <!-- RIGHT: Features -->
         <div class="feature-list">
           <!-- Budget -->
-          <article class="feature-card" role="button" tabindex="0" @click="goTo('/budget')">
+          <article class="feature-card" role="button" tabindex="0" @click="goTo('/BudgetView')">
             <div class="feature-left">
               <div class="feature-icon">💼</div>
               <div>
@@ -103,7 +103,7 @@ function goTo(route: string) {
           </article>
 
           <!-- Account -->
-          <article class="feature-card" role="button" tabindex="0" @click="goTo('/account')">
+          <article class="feature-card" role="button" tabindex="0" @click="goTo('/AccountView')">
             <div class="feature-left">
               <div class="feature-icon">👤</div>
               <div>
