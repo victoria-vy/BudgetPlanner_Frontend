@@ -79,7 +79,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
 
-    // optional: Standard-Redirect
+    // Standard-Redirect
     {
       path: "/",
       redirect: "/home",
