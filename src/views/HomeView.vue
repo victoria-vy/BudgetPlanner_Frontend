@@ -42,7 +42,7 @@ function goTo(route: string) {
         </article>
 
         <!-- Expenses -->
-        <article class="feature-card" role="button" tabindex="0" @click="goTo('/expenses')">
+        <article class="feature-card" role="button" tabindex="0" @click="goTo('/ExpensesView')">
           <div class="feature-left">
             <div class="feature-icon">🧾</div>
             <div>
@@ -54,7 +54,7 @@ function goTo(route: string) {
         </article>
 
         <!-- Income -->
-        <article class="feature-card" role="button" tabindex="0" @click="goTo('/income')">
+        <article class="feature-card" role="button" tabindex="0" @click="goTo('/IncomeView')">
           <div class="feature-left">
             <div class="feature-icon">💶</div>
             <div>
@@ -66,7 +66,7 @@ function goTo(route: string) {
         </article>
 
         <!-- Stocks -->
-        <article class="feature-card" role="button" tabindex="0" @click="goTo('/stocks')">
+        <article class="feature-card" role="button" tabindex="0" @click="goTo('/StocksView')">
           <div class="feature-left">
             <div class="feature-icon">📈</div>
             <div>
@@ -78,7 +78,7 @@ function goTo(route: string) {
         </article>
 
         <!-- Savings -->
-        <article class="feature-card" role="button" tabindex="0" @click="goTo('/saving')">
+        <article class="feature-card" role="button" tabindex="0" @click="goTo('/SavingView')">
           <div class="feature-left">
             <div class="feature-icon">🎯</div>
             <div>
@@ -90,7 +90,7 @@ function goTo(route: string) {
         </article>
 
         <!-- Report -->
-        <article class="feature-card" role="button" tabindex="0" @click="goTo('/report')">
+        <article class="feature-card" role="button" tabindex="0" @click="goTo('/ReportView')">
           <div class="feature-left">
             <div class="feature-icon">📊</div>
             <div>
