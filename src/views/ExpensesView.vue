@@ -9,13 +9,11 @@ const errorMsg = ref("");
 const title = ref("");
 const category = ref<ExpenseCategory>("FOOD");
 
-//  Betrag als String für freie Eingabe + Placeholder
 const amountText = ref<string>("");
 
-// Presets fürs Dropdown (anpassen wie du willst)
+// Presets fürs Dropdown
 const amountPresets = [5, 10, 20, 50, 100, 200, 300];
 
-// --- Dropdown State ---
 const catOpen = ref(false);
 const amountOpen = ref(false);
 
@@ -57,7 +55,7 @@ async function load() {
   }
 }
 
-// Parse Betrag (akzeptiert auch Komma)
+// Parse Betrag
 const amountNumber = computed(() => {
   const raw = amountText.value.trim().replace(",", ".");
   if (!raw) return 0;
@@ -69,6 +67,7 @@ const canCreate = computed(() => {
   return title.value.trim() !== "" && amountNumber.value > 0;
 });
 
+// Kategorien aussuchen
 function iconForCategory(cat: ExpenseCategory) {
   switch (cat) {
     case "FOOD": return "🍔";
@@ -93,7 +92,7 @@ function labelForCategory(cat: ExpenseCategory) {
   }
 }
 
-// Optional: nur "saubere" Zeichen erlauben (Zahlen, Punkt, Komma)
+// nur "saubere" Zeichen erlauben (Zahlen, Punkt, Komma)
 function sanitizeAmountInput() {
   amountText.value = amountText.value.replace(/[^\d.,]/g, "");
 }
@@ -143,7 +142,6 @@ async function remove(id?: number) {
       <div class="row">
         <input v-model="title" placeholder="Titel (z.B. Einkauf)" />
 
-        <!-- Betrag: editierbar + Dropdown Presets -->
         <div class="dd">
           <div class="combo">
             <input
@@ -177,17 +175,16 @@ async function remove(id?: number) {
           </div>
         </div>
 
-        <!-- Kategorie Dropdown (wie Budget) -->
         <div class="dd">
           <button
             class="field dd-btn"
             type="button"
             @click="catOpen = !catOpen; amountOpen = false"
           >
-            <span class="dd-left">
-              <span class="dd-icon">{{ iconForCategory(category) }}</span>
-              <span>{{ labelForCategory(category) }}</span>
-            </span>
+ <span class="dd-left">
+ <span class="dd-icon">{{ iconForCategory(category) }}</span>
+ <span>{{ labelForCategory(category) }}</span>
+ </span>
             <span class="arrow">▾</span>
           </button>
 
@@ -211,7 +208,7 @@ async function remove(id?: number) {
           <span class="icon">{{ iconForCategory(e.category) }}</span>
           <div>
             <div class="cat">{{ e.title }}</div>
-            <!-- Kategorie Deutsch -->
+
             <small>
               {{ labelForCategory(e.category) }}
               <span v-if="e.date">• {{ e.date }}</span>

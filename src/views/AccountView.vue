@@ -39,10 +39,12 @@ type RegisterErrorBody =
   | string
   | null;
 
+//automatische Weiterleitung zu Profil
 onMounted(() => {
   if (isLoggedIn()) router.replace("/ProfileView");
 });
 
+//Login Funktion mit Validierung
 async function handleLogin() {
   try {
     // Frontend Validation
@@ -91,6 +93,7 @@ async function handleLogin() {
   }
 }
 
+//Sign up Funktion mit Validierung
 async function handleSignup() {
   try {
     //Frontend Validation
@@ -151,6 +154,7 @@ async function handleSignup() {
   }
 }
 
+//Logout Funktion
 function handleLogout() {
   clearToken();
 }
@@ -165,10 +169,6 @@ function handleLogout() {
 
     <p v-if="showLoginHint" class="logged-in warning">
       Bitte logge dich ein, um die anderen Funktionen zu nutzen.
-    </p>
-
-    <p v-if="loggedIn" class="logged-in">
-      Du bist aktuell eingeloggt.
     </p>
 
     <section class="grid">
@@ -194,17 +194,13 @@ function handleLogout() {
         />
 
 
-          <button class="btn primary" data-testid="login-button" @click="handleLogin">
-            Log In
-          </button>
+        <button class="btn primary" data-testid="login-button" @click="handleLogin">Log In</button>
 
-          <button v-if="loggedIn" class="btn ghost" @click="handleLogout">
-            Logout
-          </button>
+        <button v-if="loggedIn" class="btn logout" @click="handleLogout">Logout</button>
 
-          <p class="hint">
-            Info: Nachdem du dich erfolgreich eingeloggt hast, kannst du in den Profileinstellungen deine E-Mail ändern.
-          </p>
+        <p class="hint">
+          Info: Nachdem du dich erfolgreich eingeloggt hast, kannst du in den Profileinstellungen deine E-Mail ändern.
+        </p>
       </div>
 
       <div class="card">
@@ -237,9 +233,7 @@ function handleLogout() {
           data-testid="signup-password"
         />
 
-        <button class="btn primary" data-testid="signup-button" @click="handleSignup">
-          Sign Up
-        </button>
+        <button class="btn primary" data-testid="signup-button" @click="handleSignup">Sign Up</button>
 
         <p class="hint">
           Info: Wenn die Registrierung klappt, kannst du dich direkt mit denselben Daten einloggen.
@@ -343,11 +337,11 @@ function handleLogout() {
   color: white;
 }
 
-.ghost {
+.logout {
   background: #f1f1f1;
 }
 
-.ghost:hover {
+.logout:hover {
   background: #e6e6e6;
 }
 

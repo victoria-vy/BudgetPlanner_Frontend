@@ -32,7 +32,7 @@ function hasId(s: Stock): s is Stock & { id: StockId } {
   return s.id !== null && s.id !== undefined
 }
 
-const symbol = ref('AAPL') // Startsymbol, damit immer etwas angezeigt wird
+const symbol = ref('AAPL') //Startsymbol
 const errorMsg = ref('')
 
 const savedStocks = ref<Stock[]>([])
@@ -41,7 +41,6 @@ const tvSymbol = ref(mapToTradingViewSymbol(symbol.value))
 const quote = ref<Quote | null>(null)
 const portfolioQuotes = ref<Record<string, Quote>>({})
 
-// Mehr Beispiele
 const exampleSymbols = [
   'AAPL','MSFT','TSLA','AMZN','NVDA','META','GOOGL','NFLX','AMD','INTC',
   'PEP','WMT','COST', 'ASML'
@@ -76,14 +75,13 @@ onMounted(async () => {
     return
   }
   await reloadPortfolio()
-  // immer initial laden
   await loadStockData()
 })
 
 watch(
   () => symbol.value,
   () => {
-    // immer Kurs+Widget anzeigen: bei Änderung automatisch laden
+    // immer Kurs und Widget anzeigen, bei Änderung automatisch laden
     scheduleAutoLoad()
   }
 )
@@ -129,7 +127,7 @@ async function loadStockData() {
   }
 }
 
-// Buttons bleiben (gewünscht), aber Kurs wird sowieso automatisch geladen
+// Buttons bleiben, aber Kurs wird automatisch geladen
 async function forceLoad() {
   await loadStockData()
 }
@@ -183,7 +181,7 @@ async function resetPortfolio() {
 function openFromPortfolio(s: Stock) {
   symbol.value = s.symbol
   tvSymbol.value = s.tvSymbol
-  // Kurs lädt automatisch durch watch(symbol)
+  // Kurs lädt automatisch
 }
 
 function formatDate(dateStr?: string): string {
@@ -229,10 +227,7 @@ function positionValueForRow(row: PortfolioRow): number | undefined {
   return c * row.quantity
 }
 
-/**
- * Aggregiert savedStocks -> genau 1 UI-Zeile pro Symbol (Stückzahl + Ø Kaufpreis + IDs sammeln)
- * Backend bleibt unverändert.
- */
+//Aggregiert savedStocks, genau 1 UI-Zeile pro Symbol (Stückzahl + Ø Kaufpreis + IDs sammeln)
 const portfolioRows = computed<PortfolioRow[]>(() => {
   const map = new Map<string, PortfolioRow>()
 
@@ -262,7 +257,7 @@ const portfolioRows = computed<PortfolioRow[]>(() => {
 
     if (hasId(s)) ex.ids.push(s.id)
 
-    // frühestes Kaufdatum behalten (damit deine Anzeige stabil bleibt)
+    // frühestes Kaufdatum behalten
     if (s.buyDate) {
       if (!ex.buyDate) ex.buyDate = s.buyDate
       else if (new Date(s.buyDate).getTime() < new Date(ex.buyDate).getTime()) ex.buyDate = s.buyDate
@@ -303,9 +298,9 @@ function perfForRow(row: PortfolioRow): { pct: number; text: string } | null {
 
     <p v-if="errorMsg" class="error">{{ errorMsg }}</p>
 
-    <!-- OBERER KASTEN -->
+
     <div class="card">
-      <!-- Beispiele: oben, volle Breite, gleiche Höhe wie Input -->
+      <!-- Beispiele -->
       <div class="examples-bar">
         <span class="examples-label">Beispiele:</span>
         <div class="examples-scroll" aria-label="Beispiele horizontal scroll">
@@ -320,7 +315,7 @@ function perfForRow(row: PortfolioRow): { pct: number; text: string } | null {
         </div>
       </div>
 
-      <!-- Symbol Input: volle Breite -->
+      <!-- Symbol Input-->
       <label class="label">Symbol eingeben:</label>
 
       <input
@@ -329,7 +324,6 @@ function perfForRow(row: PortfolioRow): { pct: number; text: string } | null {
         class="symbol-input"
       />
 
-      <!-- Buttons darunter, eine Zeile, gleich groß -->
       <div class="symbol-buttons">
         <button class="btn btn-wide" @click="forceLoad" :disabled="!symbol.trim()">
           Kurs laden
@@ -363,7 +357,7 @@ function perfForRow(row: PortfolioRow): { pct: number; text: string } | null {
         </table>
       </div>
 
-      <!-- Hinweis: immer sichtbar, orange, abgerundet, nah am Widget -->
+      <!-- Hinweis-->
       <div class="widget-note">
         Hinweis: Die Daten im Chart-Widget können (je nach Markt/Session) vom letzten Handelstag/Vortag stammen.
       </div>
@@ -390,27 +384,26 @@ function perfForRow(row: PortfolioRow): { pct: number; text: string } | null {
       <ul v-if="savedStocks.length">
         <li v-for="r in portfolioRows" :key="r.symbol" class="stock-row">
           <button class="pf-btn" @click="openFromPortfolio(r as any)">
-            <span class="pf-title">
-              {{ r.name ? `${r.name} (${r.symbol})` : r.symbol }}
-            </span>
+             <span class="pf-title">
+             {{ r.name ? `${r.name} (${r.symbol})` : r.symbol }}
+             </span>
 
-            <span class="pf-dates pf-inline">
-              · {{ r.quantity }} Stk
-              · Ø Kauf: {{ formatMoney(r.avgBuyPrice) }}
-              · Jetzt: {{ formatMoney(currentPriceFor(r.symbol)) }}
-              · Gesamt: {{ formatMoney(positionValueForRow(r)) }}
-              · {{ formatDate(r.buyDate) }} → {{ todayFormatted }}
-            </span>
+              <span class="pf-dates pf-inline">
+             · {{ r.quantity }} Stk
+             · Ø Kauf: {{ formatMoney(r.avgBuyPrice) }}
+             · Jetzt: {{ formatMoney(currentPriceFor(r.symbol)) }}
+             · Gesamt: {{ formatMoney(positionValueForRow(r)) }}
+             · {{ formatDate(r.buyDate) }} → {{ todayFormatted }}
+             </span>
           </button>
 
           <span
             v-if="perfForRow(r)"
             class="perf"
             :class="perfForRow(r)!.pct >= 0 ? 'pos' : 'neg'"
-            title="Performance seit Kauf (gegen Ø buyPrice)"
-          >
-      {{ perfForRow(r)!.text }}
-    </span>
+            title="Performance seit Kauf (gegen Ø buyPrice)">
+           {{ perfForRow(r)!.text }}
+           </span>
           <span v-else class="perf neutral">—</span>
 
           <button class="btn danger" @click="removeRow(r)">Löschen</button>
@@ -466,12 +459,12 @@ function perfForRow(row: PortfolioRow): { pct: number; text: string } | null {
   color: white;
 }
 
-/* Beispiele: oben, volle Breite, gleiche Höhe wie input */
+/* Beispiele */
 .examples-bar {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  height: 44px;               /* gleiche Höhe wie Input */
+  height: 44px;
   padding: 0 0.75rem;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
@@ -528,7 +521,7 @@ function perfForRow(row: PortfolioRow): { pct: number; text: string } | null {
 }
 
 .btn-wide {
-  flex: 1;                 /* exakt gleich breit */
+  flex: 1;
   text-align: center;
   background-color: #b4dda5;
   color: #000000;
@@ -568,7 +561,7 @@ function perfForRow(row: PortfolioRow): { pct: number; text: string } | null {
 .quote-table td:last-child { border-right: none; }
 .quote-table tbody tr:last-child td { border-bottom: none; }
 
-/* Hinweis: immer sichtbar, orange, abgerundet, nah am Widget */
+/* Hinweis */
 .widget-note {
   margin-top: 0.55rem;
   margin-bottom: 0.35rem; /* wenig Abstand zum Widget */
@@ -651,7 +644,7 @@ function perfForRow(row: PortfolioRow): { pct: number; text: string } | null {
   white-space: nowrap;
 }
 
-/* Inline-Infos im selben Stil wie pf-dates, nur robust für eine Zeile */
+/* Inline-Infos  */
 .pf-inline {
   overflow: hidden;
   text-overflow: ellipsis;

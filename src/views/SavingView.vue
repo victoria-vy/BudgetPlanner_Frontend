@@ -1,27 +1,21 @@
 <script setup lang="ts">
 import { onMounted, ref, computed, onBeforeUnmount } from "vue";
 import type { SavingsGoal, SavingsCategory } from "@/models/SavingsGoal";
-import {
-  createSavingsGoal,
-  deleteSavingsGoal,
-  getSavingsGoals,
-  updateSavingsGoal,
-} from "@/service/savingsService.ts";
+import { createSavingsGoal, deleteSavingsGoal, getSavingsGoals, updateSavingsGoal, } from "@/service/savingsService.ts";
 
 const goals = ref<SavingsGoal[]>([]);
 const errorMsg = ref("");
 
-// statt number=0 -> leer starten
 const newTitle = ref("");
 const newTargetText = ref<string>("");
 const newCurrentText = ref<string>("");
 const newCategory = ref<SavingsCategory>("OTHER");
 
-// Presets (anpassbar)
+// Presets
 const currentPresets = [10, 25, 50, 100, 200, 500];
 const targetPresets = [100, 250, 500, 1000, 2000, 5000, 10000];
 
-// Dropdown state
+// Dropdown
 const catOpen = ref(false);
 const currentOpen = ref(false);
 const targetOpen = ref(false);
@@ -80,7 +74,7 @@ function formatEuro(v: number) {
   );
 }
 
-// Emoji pro Kategorie
+// Kategorie auswählen
 function iconForCategory(cat?: SavingsCategory): string {
   switch (cat ?? 'OTHER') {
     case 'HOME': return '🏠'
@@ -109,7 +103,7 @@ function labelForCategory(cat?: SavingsCategory): string {
   }
 }
 
-// Parse (Komma erlaubt)
+// Parse
 function parseEuro(text: string) {
   const raw = text.trim().replace(",", ".");
   if (!raw) return 0;
@@ -201,7 +195,7 @@ async function remove(goal: SavingsGoal) {
       <div class="row">
         <input v-model="newTitle" placeholder="Titel (z.B. Sommer-Festival-Reise)" />
 
-        <!--  Schon gespart: Combo -->
+        <!-- Schon gespart: -->
         <div class="dd">
           <div class="combo">
             <input
@@ -216,8 +210,7 @@ async function remove(goal: SavingsGoal) {
               class="combo-arrow"
               type="button"
               aria-label="Schon gespart auswählen"
-              @click="currentOpen = !currentOpen; targetOpen = false; catOpen = false"
-            >
+              @click="currentOpen = !currentOpen; targetOpen = false; catOpen = false">
               ▾
             </button>
           </div>
@@ -228,8 +221,7 @@ async function remove(goal: SavingsGoal) {
               :key="'c' + p"
               type="button"
               class="dd-item"
-              @click="setPreset('current', p)"
-            >
+              @click="setPreset('current', p)">
               {{ p }} €
             </button>
           </div>
@@ -250,8 +242,7 @@ async function remove(goal: SavingsGoal) {
               class="combo-arrow"
               type="button"
               aria-label="Ziel auswählen"
-              @click="targetOpen = !targetOpen; currentOpen = false; catOpen = false"
-            >
+              @click="targetOpen = !targetOpen; currentOpen = false; catOpen = false">
               ▾
             </button>
           </div>
@@ -262,8 +253,7 @@ async function remove(goal: SavingsGoal) {
               :key="'t' + p"
               type="button"
               class="dd-item"
-              @click="setPreset('target', p)"
-            >
+              @click="setPreset('target', p)">
               {{ p }} €
             </button>
           </div>
@@ -274,12 +264,11 @@ async function remove(goal: SavingsGoal) {
           <button
             class="field dd-btn"
             type="button"
-            @click="catOpen = !catOpen; currentOpen = false; targetOpen = false"
-          >
-            <span class="dd-left">
-              <span class="dd-icon">{{ iconForCategory(newCategory) }}</span>
-              <span>{{ labelForCategory(newCategory) }}</span>
-            </span>
+            @click="catOpen = !catOpen; currentOpen = false; targetOpen = false">
+           <span class="dd-left">
+           <span class="dd-icon">{{ iconForCategory(newCategory) }}</span>
+           <span>{{ labelForCategory(newCategory) }}</span>
+           </span>
             <span class="arrow">▾</span>
           </button>
 
@@ -355,7 +344,7 @@ async function remove(goal: SavingsGoal) {
   margin-bottom: 1rem;
 }
 
-/* New Goal Row: Kategorie ganz rechts vor Button */
+/* Kategorie ganz rechts vor Button */
 .row {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr auto;
@@ -573,14 +562,14 @@ button {
 .actions {
   margin-top: 0.75rem;
   display: grid;
-  grid-template-columns: auto 1fr auto; /* links | frei | rechts */
+  grid-template-columns: auto 1fr auto;
   align-items: center;
 }
 
 .actions-left {
   display: flex;
   gap: 0.5rem;
-  justify-content: flex-start; /* ganz links */
+  justify-content: flex-start;
 }
 
 .delete {
@@ -608,7 +597,6 @@ button {
   color: #666;
 }
 
-/* Responsive */
 @media (max-width: 980px) {
   .savings {
     width: 100%;

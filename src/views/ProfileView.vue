@@ -10,7 +10,7 @@ const currentName = ref("");
 const currentEmail = ref("");
 
 const newEmail = ref("");
-const currentPassword = ref(""); // optionaler Sicherheits-Check (Backend prüft)
+const currentPassword = ref("");
 
 const loading = ref(false);
 
@@ -32,7 +32,6 @@ function getErrorMessage(e: unknown): string {
 // Typen für Responses
 type UpdateEmailResponse = { token: string; email: string; message?: string; error?: string } | string | null;
 
-// UI-Status
 const trimmedNewEmail = computed(() => newEmail.value.trim());
 const emailIsValid = computed(() => isValidEmail(trimmedNewEmail.value));
 const showEmailInvalidHint = computed(() => trimmedNewEmail.value.length > 0 && !emailIsValid.value);
@@ -130,7 +129,7 @@ async function updateEmail() {
       return;
     }
 
-    // Backend gibt neuen Token zurück (weil subject=email geändert wurde)
+    // Backend gibt neuen Token zurück
     if (typeof body !== "object" || body === null) {
       alert("E-Mail ändern fehlgeschlagen: Ungültige Server-Antwort");
       return;

@@ -9,10 +9,9 @@ const errorMsg = ref("");
 const title = ref("");
 const category = ref<IncomeCategory>("SALARY");
 
-// Betrag als Text für freie Eingabe + Placeholder
 const amountText = ref<string>("");
 
-// Presets fürs Dropdown (anpassbar)
+// Presets fürs Dropdown
 const amountPresets = [50, 100, 250, 500, 1000, 2000];
 
 // Dropdown State
@@ -48,7 +47,7 @@ async function load() {
   }
 }
 
-// Parse Betrag (akzeptiert Komma)
+// Parse Betrag
 const amountNumber = computed(() => {
   const raw = amountText.value.trim().replace(",", ".");
   if (!raw) return 0;
@@ -67,6 +66,7 @@ function setPresetAmount(v: number) {
   amountOpen.value = false;
 }
 
+// Kategorien auswählen
 function iconForCategory(cat: IncomeCategory) {
   switch (cat) {
     case "SALARY": return "💼";
@@ -127,7 +127,6 @@ async function remove(id?: number) {
       <div class="row">
         <input v-model="title" placeholder="Titel (z.B. Gehalt)" />
 
-        <!-- Betrag: editierbar + Dropdown -->
         <div class="dd">
           <div class="combo">
             <input
@@ -167,10 +166,10 @@ async function remove(id?: number) {
             type="button"
             @click="catOpen = !catOpen; amountOpen = false"
           >
-            <span class="dd-left">
-              <span class="dd-icon">{{ iconForCategory(category) }}</span>
-              <span>{{ labelForCategory(category) }}</span>
-            </span>
+             <span class="dd-left">
+             <span class="dd-icon">{{ iconForCategory(category) }}</span>
+             <span>{{ labelForCategory(category) }}</span>
+             </span>
             <span class="arrow">▾</span>
           </button>
 
@@ -194,7 +193,7 @@ async function remove(id?: number) {
           <span class="icon">{{ iconForCategory(i.category) }}</span>
           <div>
             <div class="cat">{{ i.title }}</div>
-            <!-- Kategorie Deutsch -->
+
             <small>
               {{ labelForCategory(i.category) }}
               <span v-if="i.date">• {{ i.date }}</span>

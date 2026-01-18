@@ -13,7 +13,7 @@ const monthText = ref("");
 
 const category = ref<BudgetCategory>("FOOD");
 
-// Limit: freie Eingabe + Dropdown Presets
+// Limit: freie Eingabe + Dropdown
 const limitText = ref<string>("");
 const limitPresets = [10, 20, 50, 100, 200, 500, 1000];
 
@@ -58,8 +58,7 @@ async function load() {
   }
 }
 
-/* ---------------- Monat Parser (UI -> YYYY-MM) ---------------- */
-
+/* Monat Parser (UI -> YYYY-MM) */
 const monthNameToMM: Record<string, string> = {
   januar: "01",
   jan: "01",
@@ -107,7 +106,7 @@ function normalizeMonthInputToYYYYMM(input: string): string {
   const raw = input.trim();
   if (!raw) return "";
 
-  // 1) Wenn User schon YYYY-MM eingibt
+  // Wenn User schon YYYY-MM eingibt
   const iso = raw.match(/^(\d{4})-(\d{1,2})$/);
   if (iso) {
     const [, y, mRaw] = iso;
@@ -119,10 +118,10 @@ function normalizeMonthInputToYYYYMM(input: string): string {
     return "";
   }
 
-  // 2) Komma optional: "Januar, 2026" -> "Januar 2026"
+  // Komma optional: "Januar, 2026" -> "Januar 2026"
   const cleaned = raw.replace(/,/g, " ").replace(/\s+/g, " ").trim();
 
-  // a) "01 2026" / "1 2026"
+  // "01 2026" / "1 2026"
   const numFirst = cleaned.match(/^(\d{1,2})\s+(\d{4})$/);
   if (numFirst) {
     const [, mRaw, y] = numFirst;
@@ -133,7 +132,7 @@ function normalizeMonthInputToYYYYMM(input: string): string {
     if (mi >= 1 && mi <= 12) return `${y}-${m}`;
   }
 
-  // b) "2026 01" / "2026 1"
+  // "2026 01" / "2026 1"
   const yearFirst = cleaned.match(/^(\d{4})\s+(\d{1,2})$/);
   if (yearFirst) {
     const [, y, mRaw] = yearFirst;
@@ -144,7 +143,7 @@ function normalizeMonthInputToYYYYMM(input: string): string {
     if (mi >= 1 && mi <= 12) return `${y}-${m}`;
   }
 
-  // c) Monatsname (de), z.B. "Januar 2026"
+  // Monatsname (de), z.B. "Januar 2026"
   const parts = cleaned.split(" ").filter(Boolean);
   if (parts.length >= 2) {
     const year = parts[parts.length - 1];
@@ -199,6 +198,7 @@ function setPresetLimit(v: number) {
   limitOpen.value = false;
 }
 
+//Budget anlegen
 async function addBudget() {
   errorMsg.value = "";
   try {
@@ -221,12 +221,14 @@ async function addBudget() {
   }
 }
 
+//Budget löschen
 async function remove(id?: number) {
   if (!id) return;
   await deleteBudget(id);
   budgets.value = budgets.value.filter((b) => b.id !== id);
 }
 
+//Kategorien auswählen
 function iconForCategory(cat: BudgetCategory) {
   switch (cat) {
     case "FOOD": return "🍔";
@@ -268,14 +270,12 @@ function displayTitle(b: Budget) {
       <div class="row">
         <input v-model="title" placeholder="Titel (z.B. Wocheneinkauf)" />
 
-        <!-- Monat als "Monat, Jahr" (Komma egal), gespeichert als YYYY-MM -->
         <input
           v-model="monthText"
           placeholder="Monat, Jahr"
           @blur="normalizeMonthField"
         />
 
-        <!-- Limit: Combo (Eingabe + Dropdown) -->
         <div class="dd">
           <div class="combo">
             <input
@@ -309,17 +309,16 @@ function displayTitle(b: Budget) {
           </div>
         </div>
 
-        <!-- Kategorie: Dropdown wie bisher -->
         <div class="dd">
           <button
             class="field dd-btn"
             type="button"
             @click="catOpen = !catOpen; limitOpen = false"
           >
-            <span class="dd-left">
-              <span class="dd-icon">{{ iconForCategory(category) }}</span>
-              <span>{{ labelForCategory(category) }}</span>
-            </span>
+ <span class="dd-left">
+ <span class="dd-icon">{{ iconForCategory(category) }}</span>
+ <span>{{ labelForCategory(category) }}</span>
+ </span>
             <span class="arrow">▾</span>
           </button>
 
@@ -346,7 +345,7 @@ function displayTitle(b: Budget) {
             <div class="cat">{{ displayTitle(b) }}</div>
 
             <small class="meta">
-              <!-- Anzeige im UI: Monat Jahr -->
+
               <span>{{ displayMonthYYYYMMToUser(b.month) }}</span>
               <span class="dot">•</span>
               <span class="small-cat">{{ labelForCategory(b.category) }}</span>

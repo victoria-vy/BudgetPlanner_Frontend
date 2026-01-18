@@ -12,7 +12,6 @@ import type { SavingsGoal } from "@/models/SavingsGoal";
 const data = ref<ReportResponse | null>(null);
 const errorMsg = ref("");
 
-// --- Dropdown state (wie Budgets) ---
 const yearOpen = ref(false);
 const monthOpen = ref(false);
 
@@ -37,12 +36,11 @@ function getErrorMessage(e: unknown): string {
   return "Fehler";
 }
 
-// --- Jahr/Monat Auswahl ---
 const now = new Date();
 const selectedYear = ref(String(now.getFullYear()));
 const selectedMonth = ref(String(now.getMonth() + 1).padStart(2, "0")); // "01".."12"
 
-// Backend bleibt YYYY-MM (Budgets sind so gespeichert)
+// Backend bleibt YYYY-MM
 const month = computed(() => `${selectedYear.value}-${selectedMonth.value}`);
 
 const monthOptions = [
@@ -81,14 +79,13 @@ function setMonth(m: string) {
   monthOpen.value = false;
 }
 
-// --- Charts ---
 const barCanvas = ref<HTMLCanvasElement | null>(null);
 const pieCanvas = ref<HTMLCanvasElement | null>(null);
 
 let barChart: Chart<"bar"> | null = null;
 let pieChart: Chart<"doughnut"> | null = null;
 
-// Klick-Info (zeigt Wert mit €)
+// Klick-Info
 const barClickInfo = ref<string>("");
 const pieClickInfo = ref<string>("");
 
@@ -181,7 +178,7 @@ function renderCharts() {
           if (!elements.length) return;
 
           const el = elements[0];
-          if (!el) return; // <- Fix: el kann laut TS undefined sein
+          if (!el) return;
 
           const i = el.index;
           const ds = el.datasetIndex;
@@ -196,7 +193,7 @@ function renderCharts() {
     });
   }
 
-  // Pie chart (nur Ausgaben > 0)
+  // Pie chart
   if (pieCanvas.value) {
     const spentRows = data.value.rows.filter((r) => r.spent > 0);
     const pieLabels = spentRows.map((r) => r.category);
@@ -224,7 +221,6 @@ function renderCharts() {
         layout: {
           padding: { top: 8, right: 10, bottom: 22, left: 10 },
         },
-        // Fix: radius/cutout gehören bei dir als Typ offenbar in options, nicht ins Dataset
         radius: "90%",
         cutout: "60%",
         plugins: {
@@ -245,7 +241,7 @@ function renderCharts() {
           if (!elements.length) return;
 
           const el = elements[0];
-          if (!el) return; // <- Fix: el kann laut TS undefined sein
+          if (!el) return;
 
           const i = el.index;
 
@@ -259,7 +255,7 @@ function renderCharts() {
   }
 }
 
-// Stocks Summary Load
+// Stocks laden
 async function loadStocksSummary() {
   try {
     stocks.value = await getUserStocks();
@@ -275,7 +271,7 @@ async function loadStocksSummary() {
   }
 }
 
-// Savings Summary Load
+// Savings laden
 async function loadSavingsSummary() {
   try {
     goals.value = await getSavingsGoals();
@@ -300,7 +296,7 @@ function euro(v: number) {
 }
 
 function percentClass(r: { budgetLimit: number; remaining: number }) {
-  // Kein Budget gesetzt -> kennzeichnen
+  // Kein Budget gesetzt
   if (!Number.isFinite(r.budgetLimit) || r.budgetLimit <= 0) return "no-budget";
 
   // Noch übrig -> grün, sonst rot
@@ -313,7 +309,7 @@ function percentTitle(r: { budgetLimit: number; remaining: number }) {
 }
 
 
-// --- Stocks KPIs ---
+// Stocks KPIs
 const stocksCount = computed(() => stocks.value.length);
 
 const stocksInvested = computed(() =>
@@ -341,7 +337,7 @@ const stocksPnLPct = computed(() => {
   return (stocksPnL.value / inv) * 100;
 });
 
-// --- Savings KPIs ---
+// Savings KPI
 const goalsCount = computed(() => goals.value.length);
 
 const savingsCurrentTotal = computed(() =>
@@ -375,11 +371,11 @@ const savingsPct = computed(() => {
           <button
             class="field dd-btn"
             type="button"
-            @click="yearOpen = !yearOpen; monthOpen = false"
-          >
-            <span class="dd-left">
-              <span>{{ selectedYear }}</span>
-            </span>
+            @click="yearOpen = !yearOpen; monthOpen = false">
+             <span class="dd-left">
+             <span>{{ selectedYear }}</span>
+             </span>
+
             <span class="arrow">▾</span>
           </button>
 
@@ -389,8 +385,7 @@ const savingsPct = computed(() => {
               :key="y"
               type="button"
               class="dd-item"
-              @click="setYear(y)"
-            >
+              @click="setYear(y)">
               {{ y }}
             </button>
           </div>
@@ -401,11 +396,11 @@ const savingsPct = computed(() => {
           <button
             class="field dd-btn"
             type="button"
-            @click="monthOpen = !monthOpen; yearOpen = false"
-          >
-            <span class="dd-left">
-              <span>{{ monthLabel(selectedMonth) }}</span>
-            </span>
+            @click="monthOpen = !monthOpen; yearOpen = false">
+           <span class="dd-left">
+           <span>{{ monthLabel(selectedMonth) }}</span>
+           </span>
+
             <span class="arrow">▾</span>
           </button>
 
@@ -415,8 +410,7 @@ const savingsPct = computed(() => {
               :key="m.value"
               type="button"
               class="dd-item"
-              @click="setMonth(m.value)"
-            >
+              @click="setMonth(m.value)">
               {{ m.label }}
             </button>
           </div>
@@ -534,7 +528,6 @@ const savingsPct = computed(() => {
 </template>
 
 <style scoped>
-/* (dein CSS unverändert) */
 .report {
   width: 900px;
   padding: 2rem;
@@ -560,13 +553,13 @@ const savingsPct = computed(() => {
   width: 100%;
 }
 
-/* Dropdown Wrapper (wie Budgets) */
+/* Dropdown Wrapper */
 .dd {
   position: relative;
   width: 100%;
 }
 
-/* Field Button (wie Budgets) */
+/* Field Button */
 .field {
   height: 52px;
   width: 100%;
@@ -593,7 +586,7 @@ const savingsPct = computed(() => {
   opacity: 0.8;
 }
 
-/* Dropdown Menu (wie Budgets) */
+/* Dropdown Menu */
 .dd-menu {
   position: absolute;
   top: calc(100% + 6px);
@@ -619,7 +612,7 @@ const savingsPct = computed(() => {
   background: #f3f4f6;
 }
 
-/* Button wie bei dir, aber gleiche Höhe wie Felder */
+/* Button */
 button {
   padding: 0.8rem 1.2rem;
   border-radius: 12px;
@@ -670,7 +663,7 @@ button {
   color: #b91c1c;
 }
 
-/* Tabelle wie Stocks (quote-table) */
+/* Tabelle wie Stocks */
 .quote-table {
   margin-top: 1rem;
   overflow-x: auto;
@@ -734,7 +727,7 @@ button {
   max-height: 100% !important;
 }
 
-/* Klick-Info dezent */
+/* Klick-Info */
 .click-info {
   margin-top: 0.4rem;
   padding: 0.45rem 0.65rem;

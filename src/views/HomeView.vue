@@ -12,7 +12,7 @@ function goTo(route: string) {
 <template>
   <main class="home">
     <section class="layout">
-      <!-- LEFT: Mascot + Speech Bubble -->
+      <!-- Links: Mascot + Speech Bubble -->
       <div class="panel mascot-card">
         <div class="speech">
           <div class="speech-title">Hallo 👋</div>
@@ -28,92 +28,91 @@ function goTo(route: string) {
         </div>
       </div>
 
-      <!-- RIGHT: Features -->
-        <div class="feature-list">
-          <!-- Budget -->
-          <article class="feature-card" role="button" tabindex="0" @click="goTo('/BudgetView')">
-            <div class="feature-left">
-              <div class="feature-icon">💼</div>
-              <div>
-                <div class="feature-title">Budgets</div>
-                <p class="feature-desc">Erstelle monatliche Budgets, um deine Ausgaben zu kontrollieren.</p>
-              </div>
+      <div class="feature-list">
+        <!-- Budget -->
+        <article class="feature-card" role="button" tabindex="0" @click="goTo('/BudgetView')">
+          <div class="feature-left">
+            <div class="feature-icon">💼</div>
+            <div>
+              <div class="feature-title">Budgets</div>
+              <p class="feature-desc">Erstelle monatliche Budgets, um deine Ausgaben zu kontrollieren.</p>
             </div>
-            <span class="cta">Öffnen</span>
-          </article>
+          </div>
+          <span class="cta">Öffnen</span>
+        </article>
 
-          <!-- Expenses -->
-          <article class="feature-card" role="button" tabindex="0" @click="goTo('/expenses')">
-            <div class="feature-left">
-              <div class="feature-icon">🧾</div>
-              <div>
-                <div class="feature-title">Expenses</div>
-                <p class="feature-desc">Trage Ausgaben ein und behalte deine Kosten im Blick.</p>
-              </div>
+        <!-- Expenses -->
+        <article class="feature-card" role="button" tabindex="0" @click="goTo('/expenses')">
+          <div class="feature-left">
+            <div class="feature-icon">🧾</div>
+            <div>
+              <div class="feature-title">Expenses</div>
+              <p class="feature-desc">Trage Ausgaben ein und behalte deine Kosten im Blick.</p>
             </div>
-            <span class="cta">Öffnen</span>
-          </article>
+          </div>
+          <span class="cta">Öffnen</span>
+        </article>
 
-          <!-- Income -->
-          <article class="feature-card" role="button" tabindex="0" @click="goTo('/income')">
-            <div class="feature-left">
-              <div class="feature-icon">💶</div>
-              <div>
-                <div class="feature-title">Income</div>
-                <p class="feature-desc">Erfasse Einnahmen und sieh, wie viel dir wirklich bleibt.</p>
-              </div>
+        <!-- Income -->
+        <article class="feature-card" role="button" tabindex="0" @click="goTo('/income')">
+          <div class="feature-left">
+            <div class="feature-icon">💶</div>
+            <div>
+              <div class="feature-title">Income</div>
+              <p class="feature-desc">Erfasse Einnahmen und sieh, wie viel dir wirklich bleibt.</p>
             </div>
-            <span class="cta">Öffnen</span>
-          </article>
+          </div>
+          <span class="cta">Öffnen</span>
+        </article>
 
-          <!-- Stocks -->
-          <article class="feature-card" role="button" tabindex="0" @click="goTo('/stocks')">
-            <div class="feature-left">
-              <div class="feature-icon">📈</div>
-              <div>
-                <div class="feature-title">Stocks</div>
-                <p class="feature-desc">Speichere Aktien und verwalte dein Portfolio.</p>
-              </div>
+        <!-- Stocks -->
+        <article class="feature-card" role="button" tabindex="0" @click="goTo('/stocks')">
+          <div class="feature-left">
+            <div class="feature-icon">📈</div>
+            <div>
+              <div class="feature-title">Stocks</div>
+              <p class="feature-desc">Speichere Aktien und verwalte dein Portfolio.</p>
             </div>
-            <span class="cta">Öffnen</span>
-          </article>
+          </div>
+          <span class="cta">Öffnen</span>
+        </article>
 
-          <!-- Savings -->
-          <article class="feature-card" role="button" tabindex="0" @click="goTo('/saving')">
-            <div class="feature-left">
-              <div class="feature-icon">🎯</div>
-              <div>
-                <div class="feature-title">Savings</div>
-                <p class="feature-desc">Lege Sparziele an und verfolge deinen Fortschritt.</p>
-              </div>
+        <!-- Savings -->
+        <article class="feature-card" role="button" tabindex="0" @click="goTo('/saving')">
+          <div class="feature-left">
+            <div class="feature-icon">🎯</div>
+            <div>
+              <div class="feature-title">Savings</div>
+              <p class="feature-desc">Lege Sparziele an und verfolge deinen Fortschritt.</p>
             </div>
-            <span class="cta">Öffnen</span>
-          </article>
+          </div>
+          <span class="cta">Öffnen</span>
+        </article>
 
-          <!-- Report -->
-          <article class="feature-card" role="button" tabindex="0" @click="goTo('/report')">
-            <div class="feature-left">
-              <div class="feature-icon">📊</div>
-              <div>
-                <div class="feature-title">Report</div>
-                <p class="feature-desc">Sieh Auswertungen und erkenne, wo du sparen kannst.</p>
-              </div>
+        <!-- Report -->
+        <article class="feature-card" role="button" tabindex="0" @click="goTo('/report')">
+          <div class="feature-left">
+            <div class="feature-icon">📊</div>
+            <div>
+              <div class="feature-title">Report</div>
+              <p class="feature-desc">Sieh Auswertungen und erkenne, wo du sparen kannst.</p>
             </div>
-            <span class="cta">Öffnen</span>
-          </article>
+          </div>
+          <span class="cta">Öffnen</span>
+        </article>
 
-          <!-- Account -->
-          <article class="feature-card" role="button" tabindex="0" @click="goTo('/AccountView')">
-            <div class="feature-left">
-              <div class="feature-icon">👤</div>
-              <div>
-                <div class="feature-title">Account</div>
-                <p class="feature-desc">Login, Registrierung und später deine Profileinstellungen.</p>
-              </div>
+        <!-- Account -->
+        <article class="feature-card" role="button" tabindex="0" @click="goTo('/AccountView')">
+          <div class="feature-left">
+            <div class="feature-icon">👤</div>
+            <div>
+              <div class="feature-title">Account</div>
+              <p class="feature-desc">Login, Registrierung und später deine Profileinstellungen.</p>
             </div>
-            <span class="cta">Öffnen</span>
-          </article>
-        </div>
+          </div>
+          <span class="cta">Öffnen</span>
+        </article>
+      </div>
     </section>
   </main>
 </template>
@@ -129,8 +128,8 @@ function goTo(route: string) {
 .home {
   width: 100%;
   display: flex;
-  justify-content: center;      /* horizontal */
-  align-items: center;          /* vertikal */
+  justify-content: center; /* horizontal */
+  align-items: center; /* vertikal */
   padding: 2.5rem 2rem;
 }
 
@@ -157,7 +156,7 @@ function goTo(route: string) {
   height: 100%;
 }
 
-/* LEFT: Inhalt sauber verteilen */
+/* Links: Inhalt sauber verteilen */
 .mascot-card {
   display: flex;
   flex-direction: column;
@@ -225,19 +224,6 @@ function goTo(route: string) {
   object-fit: contain;
 }
 
-/* RIGHT */
-.features {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.headline {
-  margin: 0;
-  font-size: 1.8rem;
-  color: #111;
-}
-
 .feature-list {
   display: flex;
   flex-direction: column;
@@ -293,7 +279,7 @@ function goTo(route: string) {
   font-size: 0.95rem;
 }
 
-/* Öffnen-Badge (falls du das verwendest) */
+/* Öffnen-Badge */
 .cta {
   padding: 0.55rem 0.9rem;
   border-radius: 12px;
